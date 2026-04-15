@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Customer;
+use Illuminate\Http\Request;
+
+class CustomerController extends Controller
+{
+    public function index()
+    {
+        $title = 'Master Data Pelanggan';
+
+        $customers = Customer::all();
+
+        return view('customers.index', compact('customers', 'title' ));
+    }
+
+    public function create()
+    {
+        $title = 'Tambah Customers';
+
+        return view('customers.create', compact('title' ));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'cutomer_name' => 'required|string|max:255',
+            'phone' => 'required|string|min:8',
+            'address' => 'required|string|max:255'
+        ]);
+
+        Customer::create([
+            'cutomer_name' => $request->cutomer_name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ]);
+        return redirect()->route('customers.index')->with('success', 'Data berhasil ditambah!');
+    }
+
+    public function edit($id)
+    {
+        $title = "Edit Customer";
+        $customer = Customer::find($id);
+        return view('customers.edit', compact('customer', 'title'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'cutomer_name' => 'required|string|max:255',
+            'phone' => 'required|string|min:8',
+            'address' => 'required|string|max:255'
+        ]);
+        $customer = Customer::find($id);
+        $customer->cutomer_name = $request->cutomer_name;
+        $customer->phone = $request->phone;
+        $customer->address = $request->address;
+        $customer->save();
+        return redirect()->route('customers.index')->with('success', 'Data berhasil diupdate!');
+    }
+
+    public function destroy($id)
+    {
+        $customer = Customer::find($id);
+        $customer->delete();
+        return redirect()->route('customers.index');
+    }
+}

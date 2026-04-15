@@ -15,7 +15,7 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$levels): Response
     {
-        if(!in_array($request->user()->level->level_name, $levels)){
+        if (!in_array($request->user()->level->level_name, $levels)) {
             abort(403, 'Akses Ditolak');
         }
         return $next($request);
