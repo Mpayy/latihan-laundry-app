@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\OrderController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -39,6 +40,15 @@ Route::middleware(['auth', 'level:admin'])->group(function () {
     Route::get('services/edit/{id}', [ServiceController::class, 'edit'])->name('services.edit');
     Route::put('services/update/{id}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('services/destroy/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
+
+    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('orders/store', [OrderController::class, 'store'])->name('orders.store');
+
+    Route::put('orders/pickup/{id}', [OrderController::class, 'pickup'])->name('orders.pickup');
+
+    Route::get('orders/{id}/bayar', [OrderController::class, 'bayar'])->name('orders.bayar');
+    Route::put('orders/{id}/bayar', [OrderController::class, 'bayarStore'])->name('orders.bayarStore');
 
 });
 

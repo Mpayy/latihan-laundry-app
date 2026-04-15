@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('id_service')->constrained('type_of_services')->cascadeOnDelete();
             $table->integer('qty');
             $table->decimal('subtotal',10,2); // 10 angka maksimal, 2 angka dibelakang koma
-            $table->text('notes');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

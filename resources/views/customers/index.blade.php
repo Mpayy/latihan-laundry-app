@@ -6,9 +6,8 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Data User</h5>
-                    <div class="mb-3" align='right'>
-                        <a href="{{ route('customers.create') }}" class="btn btn-primary btn-sm">Create</a>
+                    <div class="mt-3 mb-3" align='right'>
+                        <a href="{{ route('customers.create') }}" class="btn btn-primary">Tambah</a>
                     </div>
                     <!-- Table with stripped rows -->
                     <table class="table">
