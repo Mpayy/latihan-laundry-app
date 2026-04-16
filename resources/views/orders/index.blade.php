@@ -16,7 +16,8 @@
                                 <th>
                                     Customer
                                 </th>
-                                <th>Tanggal</th>
+                                <th>Tanggal Order</th>
+                                <th>Tanggal Akhir Pesanan</th>
                                 <th>Total</th>
                                 <th>Status</th>
                                 <th>Ambil</th>
@@ -28,6 +29,7 @@
                             <tr>
                                 <td>{{ $order->customer->cutomer_name }}</td>
                                 <td>{{ $order->order_date }}</td>
+                                <td>{{ $order->order_end_date }}</td>
                                 <td>{{ $order->total }}</td>
                                 <td>
                                     @if($order->order_status === 0)
@@ -48,18 +50,10 @@
                                     @endif
                                 </td>
                                 <td>
-                                    {{-- @if($order->order_status === 1) --}}
+                                    @if($order->order_status === 1)
                                         <a href="{{ route('orders.bayar', $order->id) }}" class="btn btn-primary">Bayar</a>
-                                    {{-- @endif --}}
+                                    @endif
                                 </td>
-                                {{-- <td class="d-flex">
-                                    <a href="{{ route('orders.edit', $order->id) }}" class="btn btn-primary">Ubah</a>
-                                    <form action="{{ route('orders.destroy', $order->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">Hapus</button>
-                                    </form>
-                                </td> --}}
                             </tr>
                             @endforeach
                         </tbody>

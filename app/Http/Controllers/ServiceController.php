@@ -27,7 +27,7 @@ class ServiceController extends Controller
     {
         $request->validate([
             'service_name' => 'required|string|max:255',
-            'price' => 'required',
+            'price' => 'required|integer',
             'description' => 'required|string|max:255'
         ]);
 
@@ -36,7 +36,7 @@ class ServiceController extends Controller
             'price' => $request->price,
             'description' => $request->description,
         ]);
-        return redirect()->route('services.index')->with('success', 'Data berhasil ditambah!');
+        return redirect()->route('services.index');
     }
 
     public function edit($id)
@@ -50,7 +50,7 @@ class ServiceController extends Controller
     {
         $request->validate([
             'service_name' => 'required|string|max:255',
-            'price' => 'required|min:8',
+            'price' => 'required|integer',
             'description' => 'required|string|max:255'
         ]);
         $service = Service::find($id);
@@ -58,7 +58,7 @@ class ServiceController extends Controller
         $service->price = $request->price;
         $service->description = $request->description;
         $service->save();
-        return redirect()->route('services.index')->with('success', 'Data berhasil diupdate!');
+        return redirect()->route('services.index');
     }
 
     public function destroy($id)

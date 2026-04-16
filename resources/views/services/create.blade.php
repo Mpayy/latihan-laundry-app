@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', $title ?? 'Tambah User')
+@section('title', $title ?? '')
 @section('content')
     <div class="row">
         <div class="col-sm-12">

@@ -1,31 +1,41 @@
 @extends('layouts.app')
 @section('content')
-    <div class="row">
+<div class="row">
     <div class="col-lg-7">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Detail Pesanan</h5>
-                
+
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>Customer</span>
                         <strong>{{ $order->customer->cutomer_name }}</strong>
                     </li>
+                    @foreach($order->details as $detail)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>Layanan</span>
-                        <span class="badge bg-info text-dark">{{ $order->details->first()->service->service_name }}</span>
+                        <div>
+                            <strong>{{ $detail->service->service_name }}</strong><br>
+                        </div>
+                        <span class="badge bg-info text-dark">
+                            {{ number_format($detail->subtotal) }}
+                        </span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>Harga /Kg</span>
-                        <strong>Rp {{ number_format($order->details->first()->service->price, 0, ',', '.') }}</strong>
-                    </li>
+                    @endforeach
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>Berat</span>
                         <strong>{{ $order->details->first()->qty }} Kg</strong>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center py-3">
-                        <span class="h5 mb-0">Total Tagihan</span>
+                        <span class="h5 mb-0">Total</span>
                         <span class="h5 mb-0 text-primary">Rp {{ number_format($order->total, 0, ',', '.') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <span class="h5 mb-0">Pajak</span>
+                        <span class="h5 mb-0 text-primary">{{ $order->pajak }}%</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                        <span class="h5 mb-0">Total Bayar</span>
+                        <span class="h5 mb-0 text-primary">Rp {{ number_format($order->total_bayar, 0, ',', '.') }}</span>
                     </li>
                 </ul>
             </div>
@@ -40,7 +50,7 @@
                 <form action="{{ route('orders.bayarStore', $order->id) }}" method="POST">
                     @csrf
                     @method('PUT')
-                    
+
                     <input type="hidden" id="total" value="{{ $order->total }}">
 
                     <div class="mb-3">

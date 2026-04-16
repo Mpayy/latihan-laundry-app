@@ -40,7 +40,9 @@ Route::middleware(['auth', 'level:admin'])->group(function () {
     Route::get('services/edit/{id}', [ServiceController::class, 'edit'])->name('services.edit');
     Route::put('services/update/{id}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('services/destroy/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
+});
 
+Route::middleware(['auth', 'level:operator'])->group(function () {
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
     Route::post('orders/store', [OrderController::class, 'store'])->name('orders.store');
@@ -49,11 +51,6 @@ Route::middleware(['auth', 'level:admin'])->group(function () {
 
     Route::get('orders/{id}/bayar', [OrderController::class, 'bayar'])->name('orders.bayar');
     Route::put('orders/{id}/bayar', [OrderController::class, 'bayarStore'])->name('orders.bayarStore');
-
-});
-
-Route::middleware(['auth', 'level:operator'])->group(function () {
-    // Route::resource('order', OrderController::class);
 });
 
 Route::middleware(['auth', 'level:pimpinan'])->group(function () {

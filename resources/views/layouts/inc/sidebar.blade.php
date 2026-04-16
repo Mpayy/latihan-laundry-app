@@ -9,7 +9,7 @@
           <span>Dashboard</span>
         </a>
       </li><!-- End Dashboard Nav -->
-
+      @if (Auth::user()->level->level_name == 'admin')
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('users.index') }}">
           <i class="bi bi-person"></i>
@@ -30,13 +30,15 @@
           <span>Services</span>
         </a>
       </li><!-- End Services Page Nav -->
-
+      @endif
+      @if (Auth::user()->level->level_name == 'operator')
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('orders.index') }}">
           <i class="bi bi-envelope"></i>
           <span>Orders</span>
         </a>
       </li><!-- End Orders Page Nav -->
+      @endif
     </ul>
 
   </aside><!-- End Sidebar-->

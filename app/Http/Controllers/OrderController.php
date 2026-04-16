@@ -13,39 +13,85 @@ class OrderController extends Controller
 {
     public function create()
     {
+        $title = 'Tambah Order';
         $customers = Customer::all();
         $services = Service::all();
-        return view('orders.create', compact('customers', 'services'));
+        return view('orders.create', compact('customers', 'services', 'title'));
     }
 
     public function store(Request $request)
     {
+        // $request->validate([
+        //     'id_customer' => 'required',
+        //     'id_service' => 'required|array',
+        //     'qty' => 'required|array',
+        //     'subtotal' => 'required|array',
+        // ]);
+
+        // $service = Service::find($request->id_service);
+        // $subtotal = $service->price * $request->qty;
+        // $order = Order::create([
+        //     'id_customer' => $request->id_customer,
+        //     'order_code' => 'ORD-'.time(),
+        //     'order_date' => now(),
+        //     'order_status' => 0,
+        //     'total' => 0
+        // ]);
+
+        // OrderDetail::create([
+        //     'id_order' => $order->id,
+        //     'id_service' => $service->id,
+        //     'qty' => $request->qty,
+        //     'price' => $service->price,
+        //     'subtotal' => $subtotal,
+        // ]);
+
+        // $order->update([
+        //     'total' => $subtotal
+        // ]);
+
         $request->validate([
             'id_customer' => 'required',
-            'id_service' => 'required',
-            'qty' => 'required|numeric|min:1',
+            'id_service' => 'required|array',
+            'qty' => 'required|array',
         ]);
 
-        $service = Service::find($request->id_service);
-        $subtotal = $service->price * $request->qty;
         $order = Order::create([
             'id_customer' => $request->id_customer,
-            'order_code' => 'ORD-'.time(),
+            'order_code' => 'ORD-' . time(),
             'order_date' => now(),
             'order_status' => 0,
             'total' => 0
         ]);
 
-        OrderDetail::create([
-            'id_order' => $order->id,
-            'id_service' => $service->id,
-            'qty' => $request->qty,
-            'price' => $service->price,
-            'subtotal' => $subtotal,
-        ]);
+        $total = 0;
+
+        foreach ($request->id_service as $key => $serviceId) {
+
+            $service = Service::find($serviceId);
+            $qty = $request->qty[$key];
+            $subtotal = $service->price * $qty;
+
+            OrderDetail::create([
+                'id_order' => $order->id,
+                'id_service' => $serviceId,
+                'qty' => $qty,
+                'price' => $service->price,
+                'subtotal' => $subtotal,
+            ]);
+
+            $total += $subtotal;
+        }
+
+        $taxPercent = 10; // misal 10%
+        $taxAmount = ($total * $taxPercent) / 100;
+        $grandTotal = $total + $taxAmount;
 
         $order->update([
-            'total' => $subtotal
+            'total' => $total,
+            'pajak' => $taxPercent,
+            'jumlah_pajak' => $taxAmount,
+            'total_bayar' => $grandTotal,
         ]);
 
         return redirect()->route('orders.index');
@@ -53,7 +99,7 @@ class OrderController extends Controller
 
     public function index()
     {
-        $title = 'Data Order';
+        $title = 'Master Data Order';
         $orders = Order::with(['customer'])->latest()->get();
         return view('orders.index', compact('orders', 'title'));
     }
@@ -98,5 +144,4 @@ class OrderController extends Controller
 
         return redirect()->route('orders.index');
     }
-    
 }

@@ -17,7 +17,10 @@ class Order extends Model
         'order_status',
         'order_pay',
         'order_change',
-        'total'
+        'total',
+        'pajak',
+        'jumlah_pajak',
+        'total_bayar',
     ];
 
     public function customer()

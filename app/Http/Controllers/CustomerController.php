@@ -18,7 +18,7 @@ class CustomerController extends Controller
 
     public function create()
     {
-        $title = 'Tambah Customers';
+        $title = 'Tambah Pelanggan';
 
         return view('customers.create', compact('title' ));
     }
@@ -27,7 +27,7 @@ class CustomerController extends Controller
     {
         $request->validate([
             'cutomer_name' => 'required|string|max:255',
-            'phone' => 'required|string|min:8',
+            'phone' => 'required|string',
             'address' => 'required|string|max:255'
         ]);
 
@@ -36,7 +36,7 @@ class CustomerController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
         ]);
-        return redirect()->route('customers.index')->with('success', 'Data berhasil ditambah!');
+        return redirect()->route('customers.index');
     }
 
     public function edit($id)
@@ -50,7 +50,7 @@ class CustomerController extends Controller
     {
         $request->validate([
             'cutomer_name' => 'required|string|max:255',
-            'phone' => 'required|string|min:8',
+            'phone' => 'required|string',
             'address' => 'required|string|max:255'
         ]);
         $customer = Customer::find($id);
@@ -58,7 +58,7 @@ class CustomerController extends Controller
         $customer->phone = $request->phone;
         $customer->address = $request->address;
         $customer->save();
-        return redirect()->route('customers.index')->with('success', 'Data berhasil diupdate!');
+        return redirect()->route('customers.index');
     }
 
     public function destroy($id)
