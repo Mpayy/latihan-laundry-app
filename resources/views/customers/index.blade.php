@@ -3,48 +3,65 @@
 @section('content')
 <section class="section">
     <div class="row">
-        <div class="col-lg-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="mt-3 mb-3" align='right'>
-                        <a href="{{ route('customers.create') }}" class="btn btn-primary">Tambah</a>
-                    </div>
-                    <!-- Table with stripped rows -->
-                    <table class="table">
-                        <thead>
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-people-fill me-2 text-primary"></i>Daftar Customer
+                    </h5>
+                    <a href="{{ route('customers.create') }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle me-1"></i>Tambah Customer
+                    </a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <th>
-                                    Nama Customer
-                                </th>
+                                <th>#</th>
+                                <th>Nama Customer</th>
                                 <th>Phone</th>
                                 <th>Address</th>
-                                <th>Aksi</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($customers as $customer)
+                            @forelse($customers as $i => $customer)
                             <tr>
-                                <td>{{ $customer->cutomer_name }}</td>
+                                <td>{{ $i + 1 }}</td>
+                                <td>
+                                    <strong>{{ $customer->cutomer_name }}</strong>
+                                </td>
                                 <td>{{ $customer->phone }}</td>
-                                <td>{{ $customer->address }}</td>
-                                <td class="d-flex">
-                                    <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-primary">Ubah</a>
-                                    <form action="{{ route('customers.destroy', $customer->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">Hapus</button>
-                                    </form>
+                                <td><span class="badge bg-primary">{{ $customer->address }}</span></td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-pencil me-1"></i>Edit
+                                        </a>
+                                        <form action="{{ route('customers.destroy', $customer->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus customer ini?')">
+                                                <i class="bi bi-trash me-1"></i>Hapus
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>Belum ada data customer
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
-                    <!-- End Table with stripped rows -->
-
                 </div>
             </div>
-
         </div>
     </div>
+</div>
 </section>
 @endsection

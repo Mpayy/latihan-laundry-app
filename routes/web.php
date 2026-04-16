@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReportController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -54,5 +55,6 @@ Route::middleware(['auth', 'level:operator'])->group(function () {
 });
 
 Route::middleware(['auth', 'level:pimpinan'])->group(function () {
-    // Route::get('/laporan', [ReportController::class, 'index']);
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.exportPdf');
 });

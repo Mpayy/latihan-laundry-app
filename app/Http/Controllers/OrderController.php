@@ -21,35 +21,6 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        // $request->validate([
-        //     'id_customer' => 'required',
-        //     'id_service' => 'required|array',
-        //     'qty' => 'required|array',
-        //     'subtotal' => 'required|array',
-        // ]);
-
-        // $service = Service::find($request->id_service);
-        // $subtotal = $service->price * $request->qty;
-        // $order = Order::create([
-        //     'id_customer' => $request->id_customer,
-        //     'order_code' => 'ORD-'.time(),
-        //     'order_date' => now(),
-        //     'order_status' => 0,
-        //     'total' => 0
-        // ]);
-
-        // OrderDetail::create([
-        //     'id_order' => $order->id,
-        //     'id_service' => $service->id,
-        //     'qty' => $request->qty,
-        //     'price' => $service->price,
-        //     'subtotal' => $subtotal,
-        // ]);
-
-        // $order->update([
-        //     'total' => $subtotal
-        // ]);
-
         $request->validate([
             'id_customer' => 'required',
             'id_service' => 'required|array',
@@ -100,7 +71,7 @@ class OrderController extends Controller
     public function index()
     {
         $title = 'Master Data Order';
-        $orders = Order::with(['customer'])->latest()->get();
+        $orders = Order::with(['customer', 'details.service'])->latest()->get();
         return view('orders.index', compact('orders', 'title'));
     }
 
@@ -120,7 +91,7 @@ class OrderController extends Controller
             'pickup_date' => now(),
         ]);
 
-        return redirect()->route('orders.index');
+        return redirect()->route('orders.index')->with('success', 'Status pickup berhasil diperbarui.');
     }
 
     public function bayar($id)
@@ -137,11 +108,11 @@ class OrderController extends Controller
 
         $order = Order::find($id);
         $order->update([
-            'order_pay' => $request->order_pay,
-            'order_change' => $request->order_pay - $order->total,
+            'order_pay'    => $request->order_pay,
+            'order_change' => $request->order_pay - ($order->total_bayar ?? $order->total),
             'order_status' => 2,
         ]);
 
-        return redirect()->route('orders.index');
+        return redirect()->route('orders.index')->with('success', 'Pembayaran berhasil diproses.');
     }
 }
