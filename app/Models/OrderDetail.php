@@ -11,6 +11,7 @@ class OrderDetail extends Model
         'id_order',
         'id_service',
         'qty',
+        'price',
         'subtotal',
         'notes'
     ];

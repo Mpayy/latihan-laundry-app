@@ -21,6 +21,9 @@ class Order extends Model
         'pajak',
         'jumlah_pajak',
         'total_bayar',
+        'id_voucher',
+        'discount_percent',
+        'discount_amount',
     ];
 
     public function customer()
@@ -36,5 +39,10 @@ class Order extends Model
     public function laundryPickups()
     {
         return $this->hasMany(LaundryPickup::class, 'id_order', 'id');
+    }
+
+    public function voucher()
+    {
+        return $this->belongsTo(Voucher::class, 'id_voucher', 'id');
     }
 }

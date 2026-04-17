@@ -4,7 +4,7 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link " href="{{route('dashboard')}}">
+        <a class="nav-link collapsed" href="{{route('dashboard')}}">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
@@ -30,6 +30,13 @@
           <span>Services</span>
         </a>
       </li><!-- End Services Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{{ route('vouchers.index') }}">
+          <i class="bi bi-ticket-perforated"></i>
+          <span>Vouchers</span>
+        </a>
+      </li><!-- End Vouchers Page Nav -->
       @endif
       @if (Auth::user()->level->level_name == 'operator')
       <li class="nav-item">

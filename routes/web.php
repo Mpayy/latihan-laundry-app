@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\VoucherController;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -41,6 +42,13 @@ Route::middleware(['auth', 'level:admin'])->group(function () {
     Route::get('services/edit/{id}', [ServiceController::class, 'edit'])->name('services.edit');
     Route::put('services/update/{id}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('services/destroy/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
+
+    Route::get('vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
+    Route::get('vouchers/create', [VoucherController::class, 'create'])->name('vouchers.create');
+    Route::post('vouchers/store', [VoucherController::class, 'store'])->name('vouchers.store');
+    Route::get('vouchers/edit/{id}', [VoucherController::class, 'edit'])->name('vouchers.edit');
+    Route::put('vouchers/update/{id}', [VoucherController::class, 'update'])->name('vouchers.update');
+    Route::delete('vouchers/destroy/{id}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
 });
 
 Route::middleware(['auth', 'level:operator'])->group(function () {
@@ -52,6 +60,8 @@ Route::middleware(['auth', 'level:operator'])->group(function () {
 
     Route::get('orders/{id}/bayar', [OrderController::class, 'bayar'])->name('orders.bayar');
     Route::put('orders/{id}/bayar', [OrderController::class, 'bayarStore'])->name('orders.bayarStore');
+
+    Route::post('orders/check-voucher', [OrderController::class, 'checkVoucher'])->name('orders.checkVoucher');
 });
 
 Route::middleware(['auth', 'level:pimpinan'])->group(function () {

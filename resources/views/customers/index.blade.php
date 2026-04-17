@@ -22,6 +22,7 @@
                                 <th>Nama Customer</th>
                                 <th>Phone</th>
                                 <th>Address</th>
+                                <th>Status</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -34,6 +35,13 @@
                                 </td>
                                 <td>{{ $customer->phone }}</td>
                                 <td><span class="badge bg-primary">{{ $customer->address }}</span></td>
+                                <td>
+                                    @if($customer->is_member)
+                                        <span class="badge bg-success">Member</span>
+                                    @else
+                                        <span class="badge bg-secondary">Non-Member</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
                                         <a href="{{ route('customers.edit', $customer->id) }}" class="btn btn-sm btn-warning">

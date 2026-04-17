@@ -15,17 +15,36 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Customer <span class="text-danger">*</span></label>
-                        <select name="id_customer" class="form-select" id="customerSelect" required>
-                            <option value="">-- Pilih Customer --</option>
+                        <select name="id_customer" class="form-select" id="customerSelect">
+                            <option value="">-- Buat Customer Baru --</option>
                             @foreach ($customers as $customer)
-                            <option value="{{ $customer->id }}" {{ old('id_customer') == $customer->id ? 'selected' : '' }}>
-                                {{ $customer->cutomer_name }}
+                            <option value="{{ $customer->id }}" data-is-member="{{ $customer->is_member }}" {{ old('id_customer') == $customer->id ? 'selected' : '' }}>
+                                {{ $customer->cutomer_name }} {{ $customer->is_member ? '(Member)' : '' }}
                             </option>
                             @endforeach
                         </select>
                         @error('id_customer')
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    <div id="newCustomerForm" class="border p-3 rounded mb-3 bg-light">
+                        <h6 class="fw-semibold mb-3">Data Customer Baru</h6>
+                        <div class="mb-2">
+                            <label class="form-label">Nama Customer <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" value="{{ old('name') }}" id="newCustomerName">
+                            @error('name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">No. Telepon <span class="text-danger">*</span></label>
+                            <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" id="newCustomerPhone">
+                            @error('phone') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Alamat <span class="text-danger">*</span></label>
+                            <textarea name="address" class="form-control" rows="2" id="newCustomerAddress">{{ old('address') }}</textarea>
+                            @error('address') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                        </div>
                     </div>
 
                     <div class="mb-2">
@@ -74,6 +93,16 @@
                         <i class="bi bi-plus-circle me-1"></i>Tambah Layanan
                     </button>
 
+                    <div class="mb-3 mt-2">
+                        <label class="form-label fw-semibold">Kode Voucher (Opsional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-ticket-perforated"></i></span>
+                            <input type="text" name="voucher_code" id="voucher_code_input" class="form-control" placeholder="Masukkan kode voucher..." value="{{ old('voucher_code') }}">
+                            <button class="btn btn-outline-primary" type="button" id="btnCheckVoucher">Cek Voucher</button>
+                        </div>
+                        <div id="voucherStatus" class="form-text mt-1"></div>
+                    </div>
+
                     <hr>
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
@@ -108,6 +137,10 @@
                         <strong id="summarySubtotal">Rp 0</strong>
                     </li>
                     <li class="list-group-item px-0 d-flex justify-content-between">
+                        <span class="text-muted">Diskon (Member/Voucher)</span>
+                        <strong class="text-success" id="summaryDiscount">Rp 0</strong>
+                    </li>
+                    <li class="list-group-item px-0 d-flex justify-content-between">
                         <span class="text-muted">Pajak (10%)</span>
                         <strong id="summaryTax">Rp 0</strong>
                     </li>
@@ -128,6 +161,23 @@
 
 <script>
     const TAX_PERCENT = 10;
+
+    document.getElementById('customerSelect').addEventListener('change', function() {
+        const formObj = document.getElementById('newCustomerForm');
+        if (this.value === '') {
+            formObj.style.display = 'block';
+            document.getElementById('newCustomerName').required = true;
+            document.getElementById('newCustomerPhone').required = true;
+            document.getElementById('newCustomerAddress').required = true;
+        } else {
+            formObj.style.display = 'none';
+            document.getElementById('newCustomerName').required = false;
+            document.getElementById('newCustomerPhone').required = false;
+            document.getElementById('newCustomerAddress').required = false;
+        }
+    });
+    // Trigger saat load
+    document.getElementById('customerSelect').dispatchEvent(new Event('change'));
 
     function formatRupiah(num) {
         return 'Rp ' + Number(num).toLocaleString('id-ID');
@@ -176,10 +226,24 @@
 
         emptyMsg.style.display = hasItem ? 'none' : '';
 
-        const tax = (totalSubtotal * TAX_PERCENT) / 100;
-        const grandTotal = totalSubtotal + tax;
+        // Hitung Diskon
+        let discountPercent = 0;
+        const customerOpt = document.querySelector('#customerSelect option:checked');
+        if (customerOpt && customerOpt.dataset.isMember == '1') {
+            discountPercent += 5;
+        }
+        
+        const voucherDiscount = parseFloat(document.getElementById('voucher_code_input').dataset.discount || 0);
+        discountPercent += voucherDiscount;
+
+        const discountAmount = (totalSubtotal * discountPercent) / 100;
+        const totalAfterDiscount = totalSubtotal - discountAmount;
+
+        const tax = (totalAfterDiscount * TAX_PERCENT) / 100;
+        const grandTotal = totalAfterDiscount + tax;
 
         document.getElementById('summarySubtotal').textContent = formatRupiah(totalSubtotal);
+        document.getElementById('summaryDiscount').textContent = `- ${formatRupiah(discountAmount)}`;
         document.getElementById('summaryTax').textContent = formatRupiah(tax);
         document.getElementById('summaryTotal').textContent = formatRupiah(grandTotal);
     }
@@ -221,6 +285,44 @@
                 updateSummary();
             }
         }
+    });
+
+    // Cek Voucher AJAX
+    document.getElementById('btnCheckVoucher').addEventListener('click', function() {
+        const code = document.getElementById('voucher_code_input').value;
+        const statusEl = document.getElementById('voucherStatus');
+        const inputEl = document.getElementById('voucher_code_input');
+
+        if (!code) {
+            statusEl.textContent = '';
+            inputEl.dataset.discount = 0;
+            updateSummary();
+            return;
+        }
+
+        fetch("{{ route('orders.checkVoucher') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ code: code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                statusEl.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>${data.message} (Diskon ${data.discount}%)</span>`;
+                inputEl.dataset.discount = data.discount;
+            } else {
+                statusEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>${data.message}</span>`;
+                inputEl.dataset.discount = 0;
+            }
+            updateSummary();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            statusEl.textContent = 'Terjadi kesalahan saat mengecek voucher.';
+        });
     });
 
     // Update summary awal
