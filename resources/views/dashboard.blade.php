@@ -53,7 +53,10 @@
                 <div class="flex-fill">
                     <p class="text-muted small mb-1">Total Customer</p>
                     <h5 class="fw-bold mb-0 text-warning">{{ $totalCustomer }}</h5>
-                    <small class="text-muted">Customer terdaftar</small>
+                    {{-- <small class="text-muted">
+                        <span class="text-danger">{{ $totalNonPelanggan }} Non-Member</span> &bull;
+                        <span class="text-success">{{ $totalPelanggan }} Member</span>
+                    </small> --}}
                 </div>
             </div>
         </div>
@@ -73,6 +76,23 @@
             </div>
         </div>
     </div>
+    {{-- <div class="col-xxl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="rounded-3 p-3" style="background:rgba(13,202,240,0.12)">
+                    <i class="bi bi-ticket-perforated fs-2 text-info"></i>
+                </div>
+                <div class="flex-fill">
+                    <p class="text-muted small mb-1">Total Voucher</p>
+                    <h5 class="fw-bold mb-0 text-info">{{ $totalVoucher }}</h5>
+                    <small class="text-muted">
+                        <span class="text-success">{{ $totalVoucherAktif }} Aktif</span> &bull;
+                        <span class="text-danger">{{ $totalVoucherTidakAktif }} Tidak Aktif</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div> --}}
 
 </div>
 

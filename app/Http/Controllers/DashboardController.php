@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Customer;
 use App\Models\Service;
+use App\Models\Voucher;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -20,7 +21,12 @@ class DashboardController extends Controller
         $orderDiambil     = Order::where('order_status', 1)->count();
         $orderLunas       = Order::where('order_status', 2)->count();
         $totalCustomer    = Customer::count();
+        $totalPelanggan   = Customer::where('is_member', 1)->count();
+        $totalNonPelanggan   = Customer::where('is_member', 0)->count();
         $totalLayanan     = Service::count();
+        $totalVoucher     = Voucher::count();
+        $totalVoucherAktif     = Voucher::where('is_active', 1)->count();
+        $totalVoucherTidakAktif     = Voucher::where('is_active', 0)->count();
 
         // Total pendapatan bulan ini (order lunas)
         $bulanIni = Carbon::now()->format('Y-m');
@@ -70,7 +76,7 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'title',
             'totalOrder', 'orderPending', 'orderDiambil', 'orderLunas',
-            'totalCustomer', 'totalLayanan',
+            'totalCustomer', 'totalPelanggan', 'totalNonPelanggan', 'totalLayanan', 'totalVoucher', 'totalVoucherAktif', 'totalVoucherTidakAktif',
             'pendapatanBulanIni', 
             // 'pendapatanBulanLalu', 'pertumbuhanPendapatan',
             // 'orderTerbaru', 'grafikData', 'layananPopuler'

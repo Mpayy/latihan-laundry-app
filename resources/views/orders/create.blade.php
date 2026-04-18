@@ -93,7 +93,10 @@
                         <i class="bi bi-plus-circle me-1"></i>Tambah Layanan
                     </button>
 
-                    <div class="mb-3 mt-2">
+                    {{-- [FITUR TAMBAHAN - VOUCHER]
+                         Uncomment blok ini jika soal ujian meminta fitur Kode Voucher.
+                         Lihat panduan lengkap di OrderController.php --}}
+                    {{-- <div class="mb-3 mt-2">
                         <label class="form-label fw-semibold">Kode Voucher (Opsional)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-ticket-perforated"></i></span>
@@ -101,7 +104,8 @@
                             <button class="btn btn-outline-primary" type="button" id="btnCheckVoucher">Cek Voucher</button>
                         </div>
                         <div id="voucherStatus" class="form-text mt-1"></div>
-                    </div>
+                    </div> --}}
+                   
 
                     <hr>
                     <div class="d-flex gap-2">
@@ -136,14 +140,19 @@
                         <span class="text-muted">Subtotal</span>
                         <strong id="summarySubtotal">Rp 0</strong>
                     </li>
-                    <li class="list-group-item px-0 d-flex justify-content-between">
+                    {{-- [FITUR TAMBAHAN - DISKON] --}}
+                         {{-- Uncomment baris ini jika soal ujian meminta fitur Diskon Member/Voucher --}}
+                    {{-- <li class="list-group-item px-0 d-flex justify-content-between">
                         <span class="text-muted">Diskon (Member/Voucher)</span>
                         <strong class="text-success" id="summaryDiscount">Rp 0</strong>
-                    </li>
-                    <li class="list-group-item px-0 d-flex justify-content-between">
+                    </li> --}}
+                    {{-- [FITUR TAMBAHAN - PAJAK] --}}
+                         {{-- Uncomment baris ini jika soal ujian meminta fitur Pajak --}}
+                    {{-- <li class="list-group-item px-0 d-flex justify-content-between">
                         <span class="text-muted">Pajak (10%)</span>
                         <strong id="summaryTax">Rp 0</strong>
-                    </li>
+                    </li>  --}}
+                   
                     <li class="list-group-item px-0 d-flex justify-content-between">
                         <span class="fw-bold fs-5">Total Bayar</span>
                         <span class="fw-bold fs-5 text-primary" id="summaryTotal">Rp 0</span>
@@ -160,7 +169,7 @@
 </div>
 
 <script>
-    const TAX_PERCENT = 10;
+    //  const TAX_PERCENT = 10; // [FITUR TAMBAHAN - PAJAK] Uncomment jika diminta fitur pajak
 
     document.getElementById('customerSelect').addEventListener('change', function() {
         const formObj = document.getElementById('newCustomerForm');
@@ -226,26 +235,29 @@
 
         emptyMsg.style.display = hasItem ? 'none' : '';
 
-        // Hitung Diskon
-        let discountPercent = 0;
-        const customerOpt = document.querySelector('#customerSelect option:checked');
-        if (customerOpt && customerOpt.dataset.isMember == '1') {
-            discountPercent += 5;
-        }
+        // Hitung Diskon Member
+        // let discountPercent = 0;
+        // const customerOpt = document.querySelector('#customerSelect option:checked');
+        // if (customerOpt && customerOpt.dataset.isMember == '1') {
+        //     discountPercent += 5;
+        // }
         
-        const voucherDiscount = parseFloat(document.getElementById('voucher_code_input').dataset.discount || 0);
-        discountPercent += voucherDiscount;
+        // Hitung Diskon Voucher
+        // const voucherDiscount = parseFloat(document.getElementById('voucher_code_input').dataset.discount || 0);
+        // discountPercent += voucherDiscount;
 
-        const discountAmount = (totalSubtotal * discountPercent) / 100;
-        const totalAfterDiscount = totalSubtotal - discountAmount;
+        // const discountAmount = (totalSubtotal * discountPercent) / 100;
+        // const totalAfterDiscount = totalSubtotal - discountAmount;
 
-        const tax = (totalAfterDiscount * TAX_PERCENT) / 100;
-        const grandTotal = totalAfterDiscount + tax;
+        // Hitung Pajak
+        // const tax = (totalAfterDiscount * TAX_PERCENT) / 100;
+        // const grandTotal = totalAfterDiscount + tax;
 
         document.getElementById('summarySubtotal').textContent = formatRupiah(totalSubtotal);
-        document.getElementById('summaryDiscount').textContent = `- ${formatRupiah(discountAmount)}`;
-        document.getElementById('summaryTax').textContent = formatRupiah(tax);
-        document.getElementById('summaryTotal').textContent = formatRupiah(grandTotal);
+        // [FITUR TAMBAHAN] Uncomment 2 baris ini jika diminta fitur Diskon & Pajak
+        // document.getElementById('summaryDiscount').textContent = `- ${formatRupiah(discountAmount)}`;
+        // document.getElementById('summaryTax').textContent = formatRupiah(tax);
+        document.getElementById('summaryTotal').textContent = formatRupiah(totalSubtotal); // Ganti totalSubtotal -> grandTotal jika aktifkan diskon/pajak
     }
 
     // Tambah baris
@@ -287,43 +299,33 @@
         }
     });
 
-    // Cek Voucher AJAX
-    document.getElementById('btnCheckVoucher').addEventListener('click', function() {
-        const code = document.getElementById('voucher_code_input').value;
-        const statusEl = document.getElementById('voucherStatus');
-        const inputEl = document.getElementById('voucher_code_input');
-
-        if (!code) {
-            statusEl.textContent = '';
-            inputEl.dataset.discount = 0;
-            updateSummary();
-            return;
-        }
-
-        fetch("{{ route('orders.checkVoucher') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ code: code })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.valid) {
-                statusEl.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>${data.message} (Diskon ${data.discount}%)</span>`;
-                inputEl.dataset.discount = data.discount;
-            } else {
-                statusEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>${data.message}</span>`;
-                inputEl.dataset.discount = 0;
-            }
-            updateSummary();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            statusEl.textContent = 'Terjadi kesalahan saat mengecek voucher.';
-        });
-    });
+    // [FITUR TAMBAHAN - VOUCHER] Uncomment seluruh blok ini jika diminta fitur Cek Voucher
+    // document.getElementById('btnCheckVoucher').addEventListener('click', function() {
+    //     const code = document.getElementById('voucher_code_input').value;
+    //     const statusEl = document.getElementById('voucherStatus');
+    //     const inputEl = document.getElementById('voucher_code_input');
+    //     if (!code) { statusEl.textContent = ''; inputEl.dataset.discount = 0; updateSummary(); return; }
+    //     fetch("{{ route('orders.checkVoucher') }}", {
+    //         method: 'POST',
+    //         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+    //         body: JSON.stringify({ code: code })
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         if (data.valid) {
+    //             statusEl.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>${data.message} (Diskon ${data.discount}%)</span>`;
+    //             inputEl.dataset.discount = data.discount;
+    //         } else {
+    //             statusEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>${data.message}</span>`;
+    //             inputEl.dataset.discount = 0;
+    //         }
+    //         updateSummary();
+    //     })
+    //     .catch(error => {
+    //         console.error('Error:', error);
+    //         statusEl.textContent = 'Terjadi kesalahan saat mengecek voucher.';
+    //     });
+    // });
 
     // Update summary awal
     updateSummary();
