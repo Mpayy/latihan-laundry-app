@@ -96,7 +96,7 @@
                     {{-- [FITUR TAMBAHAN - VOUCHER]
                          Uncomment blok ini jika soal ujian meminta fitur Kode Voucher.
                          Lihat panduan lengkap di OrderController.php --}}
-                    {{-- <div class="mb-3 mt-2">
+                    <div class="mb-3 mt-2">
                         <label class="form-label fw-semibold">Kode Voucher (Opsional)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-ticket-perforated"></i></span>
@@ -104,8 +104,43 @@
                             <button class="btn btn-outline-primary" type="button" id="btnCheckVoucher">Cek Voucher</button>
                         </div>
                         <div id="voucherStatus" class="form-text mt-1"></div>
-                    </div> --}}
+                    </div>
                    
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Metode Pembayaran <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payLater" value="later" checked>
+                                <label class="form-check-label" for="payLater">
+                                    Bayar Nanti (Pas Diambil)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="payNow" value="now">
+                                <label class="form-check-label" for="payNow">
+                                    Bayar Sekarang (Di Muka)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="payNowContainer" class="p-3 border rounded bg-light mb-3" style="display: none;">
+                        <div class="mb-2">
+                            <label class="form-label fw-semibold">Uang Diterima <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" name="order_pay" id="order_pay_input" class="form-control form-control-lg" placeholder="0" min="1">
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Kembalian</label>
+                            <div class="input-group">
+                                <span class="input-group-text text-success">Rp</span>
+                                <input type="text" id="order_change_output" class="form-control text-success fw-bold" value="0" readonly>
+                            </div>
+                        </div>
+                    </div>
 
                     <hr>
                     <div class="d-flex gap-2">
@@ -140,18 +175,19 @@
                         <span class="text-muted">Subtotal</span>
                         <strong id="summarySubtotal">Rp 0</strong>
                     </li>
-                    {{-- [FITUR TAMBAHAN - DISKON] --}}
-                         {{-- Uncomment baris ini jika soal ujian meminta fitur Diskon Member/Voucher --}}
-                    {{-- <li class="list-group-item px-0 d-flex justify-content-between">
-                        <span class="text-muted">Diskon (Member/Voucher)</span>
-                        <strong class="text-success" id="summaryDiscount">Rp 0</strong>
-                    </li> --}}
                     {{-- [FITUR TAMBAHAN - PAJAK] --}}
                          {{-- Uncomment baris ini jika soal ujian meminta fitur Pajak --}}
-                    {{-- <li class="list-group-item px-0 d-flex justify-content-between">
+                    <li class="list-group-item px-0 d-flex justify-content-between">
                         <span class="text-muted">Pajak (10%)</span>
                         <strong id="summaryTax">Rp 0</strong>
-                    </li>  --}}
+                    </li> 
+                    {{-- [FITUR TAMBAHAN - DISKON] --}}
+                         {{-- Uncomment baris ini jika soal ujian meminta fitur Diskon Member/Voucher --}}
+                    <li class="list-group-item px-0 d-flex justify-content-between">
+                        <span class="text-muted">Diskon (Member/Voucher)</span>
+                        <strong class="text-success" id="summaryDiscount">Rp 0</strong>
+                    </li>
+                    
                    
                     <li class="list-group-item px-0 d-flex justify-content-between">
                         <span class="fw-bold fs-5">Total Bayar</span>
@@ -159,17 +195,18 @@
                     </li>
                 </ul>
 
-                <div class="alert alert-info mt-3 mb-0 small">
+                <!-- <div class="alert alert-info mt-3 mb-0 small">
                     <i class="bi bi-info-circle me-1"></i>
                     Setelah order disimpan, proses pembayaran dapat dilakukan langsung dari halaman ini.
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    //  const TAX_PERCENT = 10; // [FITUR TAMBAHAN - PAJAK] Uncomment jika diminta fitur pajak
+    const TAX_PERCENT = 10; // [FITUR TAMBAHAN - PAJAK] Uncomment jika diminta fitur pajak
+    let currentGrandTotal = 0; // State global untuk fitur Bayar di Muka
 
     document.getElementById('customerSelect').addEventListener('change', function() {
         const formObj = document.getElementById('newCustomerForm');
@@ -236,28 +273,37 @@
         emptyMsg.style.display = hasItem ? 'none' : '';
 
         // Hitung Diskon Member
-        // let discountPercent = 0;
-        // const customerOpt = document.querySelector('#customerSelect option:checked');
-        // if (customerOpt && customerOpt.dataset.isMember == '1') {
-        //     discountPercent += 5;
-        // }
+        let discountPercent = 0;
+        const customerOpt = document.querySelector('#customerSelect option:checked');
+        if (customerOpt && customerOpt.dataset.isMember == '1') {
+            discountPercent += 5;
+        }
         
         // Hitung Diskon Voucher
-        // const voucherDiscount = parseFloat(document.getElementById('voucher_code_input').dataset.discount || 0);
-        // discountPercent += voucherDiscount;
-
-        // const discountAmount = (totalSubtotal * discountPercent) / 100;
-        // const totalAfterDiscount = totalSubtotal - discountAmount;
+        const voucherDiscount = parseFloat(document.getElementById('voucher_code_input').dataset.discount || 0);
+        discountPercent += voucherDiscount;
 
         // Hitung Pajak
-        // const tax = (totalAfterDiscount * TAX_PERCENT) / 100;
-        // const grandTotal = totalAfterDiscount + tax;
+        const tax = (totalSubtotal * TAX_PERCENT) / 100;
+        const totalWithTax = totalSubtotal + tax;
+        const discountAmount = (totalWithTax * discountPercent) / 100;
+        const grandTotal = totalWithTax - discountAmount;
 
         document.getElementById('summarySubtotal').textContent = formatRupiah(totalSubtotal);
         // [FITUR TAMBAHAN] Uncomment 2 baris ini jika diminta fitur Diskon & Pajak
-        // document.getElementById('summaryDiscount').textContent = `- ${formatRupiah(discountAmount)}`;
-        // document.getElementById('summaryTax').textContent = formatRupiah(tax);
-        document.getElementById('summaryTotal').textContent = formatRupiah(totalSubtotal); // Ganti totalSubtotal -> grandTotal jika aktifkan diskon/pajak
+        document.getElementById('summaryTax').textContent = formatRupiah(tax);
+        document.getElementById('summaryDiscount').textContent = `- ${formatRupiah(discountAmount)}`;
+        // document.getElementById('summaryTotal').textContent = formatRupiah(totalSubtotal); // Ganti totalSubtotal -> grandTotal jika aktifkan diskon/pajak
+        document.getElementById('summaryTotal').textContent = formatRupiah(grandTotal); // Ganti totalSubtotal -> grandTotal jika aktifkan diskon/pajak
+        
+        // Simpan nilai grand total global
+        currentGrandTotal = grandTotal;
+        
+        // Trigger ulang perhitungan kembalian jika mode Bayar Sekarang aktif
+        const payInput = document.getElementById('order_pay_input');
+        if (payInput && payInput.value) {
+            payInput.dispatchEvent(new Event('input'));
+        }
     }
 
     // Tambah baris
@@ -300,34 +346,60 @@
     });
 
     // [FITUR TAMBAHAN - VOUCHER] Uncomment seluruh blok ini jika diminta fitur Cek Voucher
-    // document.getElementById('btnCheckVoucher').addEventListener('click', function() {
-    //     const code = document.getElementById('voucher_code_input').value;
-    //     const statusEl = document.getElementById('voucherStatus');
-    //     const inputEl = document.getElementById('voucher_code_input');
-    //     if (!code) { statusEl.textContent = ''; inputEl.dataset.discount = 0; updateSummary(); return; }
-    //     fetch("{{ route('orders.checkVoucher') }}", {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-    //         body: JSON.stringify({ code: code })
-    //     })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         if (data.valid) {
-    //             statusEl.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>${data.message} (Diskon ${data.discount}%)</span>`;
-    //             inputEl.dataset.discount = data.discount;
-    //         } else {
-    //             statusEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>${data.message}</span>`;
-    //             inputEl.dataset.discount = 0;
-    //         }
-    //         updateSummary();
-    //     })
-    //     .catch(error => {
-    //         console.error('Error:', error);
-    //         statusEl.textContent = 'Terjadi kesalahan saat mengecek voucher.';
-    //     });
-    // });
+    document.getElementById('btnCheckVoucher').addEventListener('click', function() {
+        const code = document.getElementById('voucher_code_input').value;
+        const statusEl = document.getElementById('voucherStatus');
+        const inputEl = document.getElementById('voucher_code_input');
+        if (!code) { statusEl.textContent = ''; inputEl.dataset.discount = 0; updateSummary(); return; }
+        fetch("{{ route('orders.checkVoucher') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ code: code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                statusEl.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>${data.message} (Diskon ${data.discount}%)</span>`;
+                inputEl.dataset.discount = data.discount;
+            } else {
+                statusEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>${data.message}</span>`;
+                inputEl.dataset.discount = 0;
+            }
+            updateSummary();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            statusEl.textContent = 'Terjadi kesalahan saat mengecek voucher.';
+        });
+    });
 
     // Update summary awal
     updateSummary();
+
+    // Trigger bayar methods
+    document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const payContainer = document.getElementById('payNowContainer');
+            const payInput = document.getElementById('order_pay_input');
+            if (this.value === 'now') {
+                payContainer.style.display = 'block';
+                payInput.required = true;
+            } else {
+                payContainer.style.display = 'none';
+                payInput.required = false;
+                payInput.value = '';
+                document.getElementById('order_change_output').value = '0';
+            }
+        });
+    });
+
+    document.getElementById('order_pay_input').addEventListener('input', function() {
+        const received = parseFloat(this.value) || 0;
+        const sisa = received - currentGrandTotal;
+        const changeOutput = document.getElementById('order_change_output');
+        changeOutput.value = sisa.toLocaleString('id-ID');
+        changeOutput.classList.toggle('text-danger', sisa < 0);
+        changeOutput.classList.toggle('text-success', sisa >= 0);
+    });
 </script>
 @endsection

@@ -54,12 +54,14 @@
                                                         class="bi bi-box-seam me-1"></i>Diambil</span>
                                             @elseif($order->order_status === 2)
                                                 <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Lunas</span>
+                                            @elseif($order->order_status === 3)
+                                                <span class="badge bg-info text-dark"><i class="bi bi-clock-history me-1"></i>Pending & Lunas</span>
                                             @endif
                                         </td>
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center gap-2">
                                                 {{-- Tombol Pickup: buka modal konfirmasi --}}
-                                                @if($order->order_status === 0)
+                                                @if($order->order_status === 0 || $order->order_status === 3)
                                                     <button type="button" class="btn btn-sm btn-success btn-pickup"
                                                         data-order-id="{{ $order->id }}"
                                                         data-customer="{{ $order->customer->cutomer_name }}" data-bs-toggle="modal"
@@ -76,17 +78,18 @@
                                                         'grandTotal' => $order->total_bayar ?? $order->total,
                                                         // [FITUR TAMBAHAN - DISKON & PAJAK]
                                                         // Uncomment baris-baris ini jika soal meminta fitur diskon/pajak:
-                                                        // 'hasMember'           => $order->customer->is_member ? true : false,
-                                                        // 'memberPercent'       => $order->customer->is_member ? 5 : 0,
-                                                        // 'memberDiscountAmount'=> ($order->total * ($order->customer->is_member ? 5 : 0)) / 100,
-                                                        // 'totalAfterMember'    => $order->total - ($order->total * ($order->customer->is_member ? 5 : 0)) / 100,
-                                                        // 'hasVoucher'          => ($order->discount_percent - ($order->customer->is_member ? 5 : 0)) > 0,
-                                                        // 'voucherCode'         => $order->voucher->voucher_code ?? 'Voucher',
-                                                        // 'voucherPercent'      => max(0, $order->discount_percent - ($order->customer->is_member ? 5 : 0)),
-                                                        // 'voucherDiscountAmount'=> ($order->total * max(0, $order->discount_percent - ($order->customer->is_member ? 5 : 0))) / 100,
-                                                        // 'totalAfterVoucher'   => $order->total - (($order->total * ($order->customer->is_member ? 5 : 0)) / 100) - (($order->total * max(0, $order->discount_percent - ($order->customer->is_member ? 5 : 0))) / 100),
-                                                        // 'taxPercent'          => $order->pajak ?? 0,
-                                                        // 'taxAmount'           => $order->jumlah_pajak ?? 0,
+                                                        'hasMember'           => $order->customer->is_member ? true : false,
+                                                        'memberPercent'       => $order->customer->is_member ? 5 : 0,
+                                                        'taxPercent'          => $order->pajak ?? 0,
+                                                        'taxAmount'           => $order->jumlah_pajak ?? 0,
+                                                        'totalWithTax'        => $order->total + ($order->jumlah_pajak ?? 0),
+                                                        'memberDiscountAmount'=> (($order->total + ($order->jumlah_pajak ?? 0)) * ($order->customer->is_member ? 5 : 0)) / 100,
+                                                        'totalAfterMember'    => ($order->total + ($order->jumlah_pajak ?? 0)) - ((($order->total + ($order->jumlah_pajak ?? 0)) * ($order->customer->is_member ? 5 : 0)) / 100),
+                                                        'hasVoucher'          => ($order->discount_percent - ($order->customer->is_member ? 5 : 0)) > 0,
+                                                        'voucherCode'         => $order->voucher->voucher_code ?? 'Voucher',
+                                                        'voucherPercent'      => max(0, $order->discount_percent - ($order->customer->is_member ? 5 : 0)),
+                                                        'voucherDiscountAmount'=> (($order->total + ($order->jumlah_pajak ?? 0)) * max(0, $order->discount_percent - ($order->customer->is_member ? 5 : 0))) / 100,
+                                                        'totalAfterVoucher'   => ($order->total + ($order->jumlah_pajak ?? 0)) - ((($order->total + ($order->jumlah_pajak ?? 0)) * $order->discount_percent) / 100),
                                                     ];
 
                                                     $orderDetails = $order->details->map(function ($d) {
@@ -308,21 +311,23 @@
                 // Uncomment blok ini jika soal meminta fitur diskon/pajak bertahap:
                 //
                 // // 1. Total Pesanan
-                // ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-muted border-0 py-1 bg-transparent"><span>Total Pesanan</span><span>Rp ${Number(calc.baseTotal).toLocaleString('id-ID')}</span></li>`;
-                // // 2. Diskon Member
-                // if (calc.hasMember) {
-                //     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-danger border-0 py-1 bg-transparent"><span>Diskon Member (${calc.memberPercent}%)</span><span>- Rp ${Number(calc.memberDiscountAmount).toLocaleString('id-ID')}</span></li>`;
-                //     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between fw-semibold border-0 py-1 bg-transparent"><span style="font-size: 0.85rem">Total setelah diskon member</span><span style="font-size: 0.85rem">Rp ${Number(calc.totalAfterMember).toLocaleString('id-ID')}</span></li>`;
-                // }
-                // // 3. Voucher
-                // if (calc.hasVoucher) {
-                //     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-danger border-0 py-1 bg-transparent"><span>Potongan Voucher (${calc.voucherPercent}%)</span><span>- Rp ${Number(calc.voucherDiscountAmount).toLocaleString('id-ID')}</span></li>`;
-                //     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between fw-semibold border-0 py-1 bg-transparent"><span style="font-size: 0.85rem">Total setelah diskon voucher</span><span style="font-size: 0.85rem">Rp ${Number(calc.totalAfterVoucher).toLocaleString('id-ID')}</span></li>`;
-                // }
-                // // 4. Pajak
-                // if (calc.taxPercent > 0) {
-                //     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between border-0 py-1 bg-transparent" style="color: #d9a406 !important;"><span>Pajak PPN (${calc.taxPercent}%)</span><span>+ Rp ${Number(calc.taxAmount).toLocaleString('id-ID')}</span></li>`;
-                // }
+                ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-muted border-0 py-1 bg-transparent"><span>Subtotal Pesanan</span><span>Rp ${Number(calc.baseTotal).toLocaleString('id-ID')}</span></li>`;
+                
+                // // 2. Pajak (Ditambahkan lebih dulu)
+                if (calc.taxPercent > 0) {
+                    ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between border-0 py-1 bg-transparent" style="color: #d9a406 !important;"><span>Pajak PPN (${calc.taxPercent}%)</span><span>+ Rp ${Number(calc.taxAmount).toLocaleString('id-ID')}</span></li>`;
+                    ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between fw-semibold border-0 py-1 bg-transparent"><span style="font-size: 0.85rem">Total + Pajak</span><span style="font-size: 0.85rem">Rp ${Number(calc.totalWithTax).toLocaleString('id-ID')}</span></li>`;
+                }
+
+                // // 3. Diskon Member (Dihitung dari Total + Pajak)
+                if (calc.hasMember) {
+                    ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-danger border-0 py-1 bg-transparent"><span>Diskon Member (${calc.memberPercent}%)</span><span>- Rp ${Number(calc.memberDiscountAmount).toLocaleString('id-ID')}</span></li>`;
+                }
+                
+                // // 4. Voucher (Dihitung dari Total + Pajak)
+                if (calc.hasVoucher) {
+                    ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-danger border-0 py-1 bg-transparent"><span>Potongan Voucher (${calc.voucherPercent}%)</span><span>- Rp ${Number(calc.voucherDiscountAmount).toLocaleString('id-ID')}</span></li>`;
+                }
                 // [END FITUR TAMBAHAN]
 
                 // Total Akhir (selalu ditampilkan)

@@ -9,7 +9,7 @@ use App\Models\OrderDetail;
 use App\Models\LaundryPickup;
 use Illuminate\Http\Request;
 // [FITUR TAMBAHAN] Uncomment baris ini jika diminta fitur Voucher/Diskon
-// use App\Models\Voucher;
+use App\Models\Voucher;
 
 class OrderController extends Controller
 {
@@ -31,7 +31,7 @@ class OrderController extends Controller
             'id_service'  => 'required|array',
             'qty'         => 'required|array',
             // [FITUR TAMBAHAN] Uncomment jika diminta fitur Voucher
-            // 'voucher_code' => 'nullable|string',
+            'voucher_code' => 'nullable|string',
         ]);
 
         // Tentukan customer: pilih existing atau buat baru sebagai non-member
@@ -82,43 +82,50 @@ class OrderController extends Controller
         //   5. Uncomment ringkasan diskon/pajak di orders/create.blade.php & orders/index.blade.php
         //   6. Hapus atau comment 2 baris `$order->update` di bagian bawah blok ini
         //
-        // $discountPercent = 0;
-        // $appliedVoucher  = null;
-        // if ($customer->is_member) { $discountPercent += 5; }
-        // $voucherCode = trim($request->voucher_code ?? '');
-        // if ($voucherCode) {
-        //     $appliedVoucher = Voucher::where('voucher_code', $voucherCode)
-        //         ->where('is_active', 1)->where('expired_at', '>=', now()->startOfDay())->first();
-        //     if ($appliedVoucher) { $discountPercent += $appliedVoucher->discount_precentage; }
-        // }
+        $discountPercent = 0;
+        $appliedVoucher  = null;
+        if ($customer->is_member) { $discountPercent += 5; }
+        $voucherCode = trim($request->voucher_code ?? '');
+        if ($voucherCode) {
+            $appliedVoucher = Voucher::where('voucher_code', $voucherCode)
+                ->where('is_active', 1)->where('expired_at', '>=', now()->startOfDay())->first();
+            if ($appliedVoucher) { $discountPercent += $appliedVoucher->discount_precentage; }
+        }
         // $discountAmount     = ($total * $discountPercent) / 100;
         // $totalAfterDiscount = $total - $discountAmount;
-        // $taxPercent         = 12;
+        // $taxPercent         = 10;
         // $taxAmount          = ($totalAfterDiscount * $taxPercent) / 100;
         // $grandTotal         = $totalAfterDiscount + $taxAmount;
-        // $order->update([
-        //     'total'            => $total,
-        //     'discount_percent' => $discountPercent,
-        //     'discount_amount'  => $discountAmount,
-        //     'id_voucher'       => $appliedVoucher?->id,
-        //     'pajak'            => $taxPercent,
-        //     'jumlah_pajak'     => $taxAmount,
-        //     'total_bayar'      => $grandTotal,
-        // ]);
-        // $order->update([
-        //     'total'            => $total,
-        //     'discount_percent' => $discountPercent,
-        //     'discount_amount'  => $discountAmount,
-        //     'id_voucher'       => $appliedVoucher?->id,
-        //     'pajak'            => $taxPercent,
-        //     'jumlah_pajak'     => $taxAmount,
-        //     'total_bayar'      => $grandTotal,
-        // ]);
-        // if ($appliedVoucher) { $appliedVoucher->update(['is_active' => false]); }
+        $taxPercent = 10;
+        $taxAmount = ($total * $taxPercent) / 100;
+        $totalWithTax = $total + $taxAmount;
+        $discountAmount = ($totalWithTax * $discountPercent) / 100;
+        $grandTotal = $totalWithTax - $discountAmount;
+
+
+        $order->update([
+            'total'            => $total,
+            'discount_percent' => $discountPercent,
+            'discount_amount'  => $discountAmount,
+            'id_voucher'       => $appliedVoucher?->id,
+            'pajak'            => $taxPercent,
+            'jumlah_pajak'     => $taxAmount,
+            'total_bayar'      => $grandTotal,
+        ]);
+        if ($appliedVoucher) { $appliedVoucher->update(['is_active' => false]); }
         // [END FITUR TAMBAHAN]
 
+        // Handle Pembayaran di Muka
+        if ($request->payment_method === 'now' && $request->order_pay >= $grandTotal) {
+            $order->update([
+                'order_pay'    => $request->order_pay,
+                'order_change' => $request->order_pay - $grandTotal,
+                'order_status' => 3, // Status khusus: Pending & Lunas
+            ]);
+        }
+
         // Mode dasar (tanpa diskon & pajak) - comment/hapus 2 baris ini jika mengaktifkan blok atas
-        $order->update(['total' => $total, 'total_bayar' => $total]);
+        // $order->update(['total' => $total, 'total_bayar' => $total]);
 
         return redirect()->route('orders.index')->with('success', 'Order berhasil dibuat.');
     }
@@ -135,7 +142,7 @@ class OrderController extends Controller
         $order = Order::find($id);
         // Ubah Status Order dan Update Tanggal Selesai
         $order->update([
-            'order_status' => 1,
+            'order_status' => $order->order_status == 3 ? 2 : 1,
             'order_end_date' => now(),
         ]);
 
