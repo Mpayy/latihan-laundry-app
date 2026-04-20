@@ -76,8 +76,9 @@
                                                     $calcDetails = [
                                                         'baseTotal' => $order->total,
                                                         'grandTotal' => $order->total_bayar ?? $order->total,
-                                                        // [FITUR TAMBAHAN - DISKON & PAJAK]
-                                                        // Uncomment baris-baris ini jika soal meminta fitur diskon/pajak:
+                                                        // --- [START FITUR TAMBAHAN: MODAL BAYAR DISKON & PAJAK] ---
+                                                        // Uncomment baris-baris ini jika soal meminta fitur pajak/diskon:
+                                                        /*
                                                         'hasMember'           => $order->customer->is_member ? true : false,
                                                         'memberPercent'       => $order->customer->is_member ? 5 : 0,
                                                         'taxPercent'          => $order->pajak ?? 0,
@@ -90,6 +91,8 @@
                                                         'voucherPercent'      => max(0, $order->discount_percent - ($order->customer->is_member ? 5 : 0)),
                                                         'voucherDiscountAmount'=> (($order->total + ($order->jumlah_pajak ?? 0)) * max(0, $order->discount_percent - ($order->customer->is_member ? 5 : 0))) / 100,
                                                         'totalAfterVoucher'   => ($order->total + ($order->jumlah_pajak ?? 0)) - ((($order->total + ($order->jumlah_pajak ?? 0)) * $order->discount_percent) / 100),
+                                                        */
+                                                        // --- [END FITUR TAMBAHAN: MODAL BAYAR DISKON & PAJAK] ---
                                                     ];
 
                                                     $orderDetails = $order->details->map(function ($d) {
@@ -111,6 +114,15 @@
                                                         <i class="bi bi-cash-coin me-1"></i>Bayar
                                                     </button>
                                                 @endif
+                                                
+                                                <!-- --- [START FITUR TAMBAHAN: CETAK STRUK] --- -->
+                                                <!-- Uncomment baris di bawah jika diminta fitur print struk -->
+                                                <!--
+                                                <a href="{{ route('orders.cetakStruk', $order->id) }}" target="_blank" class="btn btn-sm btn-secondary">
+                                                    <i class="bi bi-printer me-1"></i>Struk
+                                                </a>
+                                                -->
+                                                <!-- --- [END FITUR TAMBAHAN: CETAK STRUK] --- -->
 
                                                 @if($order->order_status === 2)
                                                     <span class="text-muted small">—</span>
@@ -307,28 +319,29 @@
                 const ringkasanListEl = document.getElementById('bayarRingkasanList');
                 ringkasanListEl.innerHTML = '';
 
-                // [FITUR TAMBAHAN - DISKON & PAJAK]
-                // Uncomment blok ini jika soal meminta fitur diskon/pajak bertahap:
-                //
-                // // 1. Total Pesanan
+                // --- [START FITUR TAMBAHAN: MODAL BAYAR DISKON & PAJAK UI] ---
+                // Uncomment blok ini jika soal meminta detail pajak & diskon tampil di modal bayar:
+                /*
+                // 1. Total Pesanan Dasar
                 ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-muted border-0 py-1 bg-transparent"><span>Subtotal Pesanan</span><span>Rp ${Number(calc.baseTotal).toLocaleString('id-ID')}</span></li>`;
                 
-                // // 2. Pajak (Ditambahkan lebih dulu)
+                // 2. Pajak (Ditambahkan lebih dulu)
                 if (calc.taxPercent > 0) {
                     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between border-0 py-1 bg-transparent" style="color: #d9a406 !important;"><span>Pajak PPN (${calc.taxPercent}%)</span><span>+ Rp ${Number(calc.taxAmount).toLocaleString('id-ID')}</span></li>`;
                     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between fw-semibold border-0 py-1 bg-transparent"><span style="font-size: 0.85rem">Total + Pajak</span><span style="font-size: 0.85rem">Rp ${Number(calc.totalWithTax).toLocaleString('id-ID')}</span></li>`;
                 }
 
-                // // 3. Diskon Member (Dihitung dari Total + Pajak)
+                // 3. Diskon Member (Dihitung dari Total + Pajak)
                 if (calc.hasMember) {
                     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-danger border-0 py-1 bg-transparent"><span>Diskon Member (${calc.memberPercent}%)</span><span>- Rp ${Number(calc.memberDiscountAmount).toLocaleString('id-ID')}</span></li>`;
                 }
                 
-                // // 4. Voucher (Dihitung dari Total + Pajak)
+                // 4. Voucher (Dihitung dari Total + Pajak)
                 if (calc.hasVoucher) {
                     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-danger border-0 py-1 bg-transparent"><span>Potongan Voucher (${calc.voucherPercent}%)</span><span>- Rp ${Number(calc.voucherDiscountAmount).toLocaleString('id-ID')}</span></li>`;
                 }
-                // [END FITUR TAMBAHAN]
+                */
+                // --- [END FITUR TAMBAHAN: MODAL BAYAR DISKON & PAJAK UI] ---
 
                 // Total Akhir (selalu ditampilkan)
                 ringkasanListEl.innerHTML += `

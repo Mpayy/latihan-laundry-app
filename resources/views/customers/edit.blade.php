@@ -5,7 +5,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">
-                        <i class="bi bi-pencil-square me-2 text-primary"></i>{{ $title ?? 'Edit Pelanggan' }}
+                        <i class="bi bi-person-fill-add me-2 text-primary"></i>{{ $title ?? 'Edit Pelanggan' }}
                     </h5>
 
                     <form action="{{ route('customers.update', $customer->id) }}" method="POST">
@@ -28,13 +28,13 @@
                             <input type="text" name="address" class="form-control" value="{{ $customer->address }}" required>
                         </div>
                         
-                        <div class="mb-2">
+                        {{-- <div class="mb-2">
                             <label class="form-label fw-semibold">Status Member <span class="text-danger">*</span></label>
                             <select name="is_member" class="form-select" required>
                                 <option value="0" {{ !$customer->is_member ? 'selected' : '' }}>Pelanggan Biasa</option>
                                 <option value="1" {{ $customer->is_member ? 'selected' : '' }}>Member (Diskon 5%)</option>
                             </select>
-                        </div>
+                        </div> --}}
 
                         <div class="d-flex gap-2 mt-3">
                             <button type="submit" class="btn btn-primary">

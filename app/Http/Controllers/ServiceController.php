@@ -63,8 +63,8 @@ class ServiceController extends Controller
 
     public function destroy($id)
     {
-        $customer = Service::find($id);
-        $customer->delete();
-        return redirect()->route('customers.index');
+        $service = Service::find($id);
+        $service->delete();
+        return redirect()->route('services.index');
     }
 }

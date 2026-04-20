@@ -145,14 +145,14 @@
             <div class="kpi-label">Jumlah Transaksi</div>
             <div class="kpi-value">{{ $jumlahTransaksi }} Order</div>
         </div>
-        <div class="kpi-cell orange">
+        {{-- <div class="kpi-cell orange">
             <div class="kpi-label">Total Pajak (10%)</div>
             <div class="kpi-value">Rp {{ number_format($totalPajak, 0, ',', '.') }}</div>
         </div>
         <div class="kpi-cell teal">
             <div class="kpi-label">Net (Sebelum Pajak)</div>
             <div class="kpi-value">Rp {{ number_format($totalSubtotal, 0, ',', '.') }}</div>
-        </div>
+        </div> --}}
     </div>
 
     <!-- Two Column Layout -->

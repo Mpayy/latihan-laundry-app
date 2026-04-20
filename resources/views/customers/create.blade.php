@@ -26,13 +26,13 @@
                         <input type="text" name="address" class="form-control" required>
                     </div>
 
-                    <div class="mb-2">
+                    {{-- <div class="mb-2">
                         <label class="form-label fw-semibold">Status <span class="text-danger">*</span></label>
                         <select name="is_member" class="form-select" required>
                             <option value="1">Member</option>
                             <option value="0">Non-Member</option>
                         </select>
-                    </div>
+                    </div> --}}
 
                     <div class="d-flex gap-2 mt-3">
                         <button type="submit" class="btn btn-primary">

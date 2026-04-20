@@ -43,12 +43,17 @@ Route::middleware(['auth', 'level:admin'])->group(function () {
     Route::put('services/update/{id}', [ServiceController::class, 'update'])->name('services.update');
     Route::delete('services/destroy/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
+    // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
+    // Uncomment blok di bawah untuk master data voucher:
+    
     Route::get('vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
     Route::get('vouchers/create', [VoucherController::class, 'create'])->name('vouchers.create');
     Route::post('vouchers/store', [VoucherController::class, 'store'])->name('vouchers.store');
     Route::get('vouchers/edit/{id}', [VoucherController::class, 'edit'])->name('vouchers.edit');
     Route::put('vouchers/update/{id}', [VoucherController::class, 'update'])->name('vouchers.update');
     Route::delete('vouchers/destroy/{id}', [VoucherController::class, 'destroy'])->name('vouchers.destroy');
+    
+    // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
 });
 
 Route::middleware(['auth', 'level:operator'])->group(function () {
@@ -61,7 +66,13 @@ Route::middleware(['auth', 'level:operator'])->group(function () {
     Route::get('orders/{id}/bayar', [OrderController::class, 'bayar'])->name('orders.bayar');
     Route::put('orders/{id}/bayar', [OrderController::class, 'bayarStore'])->name('orders.bayarStore');
 
+    // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
     Route::post('orders/check-voucher', [OrderController::class, 'checkVoucher'])->name('orders.checkVoucher');
+    // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
+    
+    // --- [START FITUR TAMBAHAN: CETAK STRUK] ---
+    Route::get('orders/{id}/cetak-struk', [OrderController::class, 'cetakStruk'])->name('orders.cetakStruk');
+    // --- [END FITUR TAMBAHAN: CETAK STRUK] ---
 });
 
 Route::middleware(['auth', 'level:pimpinan'])->group(function () {

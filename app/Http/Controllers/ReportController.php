@@ -17,7 +17,7 @@ class ReportController extends Controller
         $end   = $request->end_date ?? Carbon::now()->format('Y-m-d');
 
         $orders = Order::with(['customer', 'details.service'])
-            ->where('order_status', 2)
+            ->whereIn('order_status', [2, 3])
             ->whereBetween('order_date', [$start, $end])
             ->orderBy('order_date', 'desc')
             ->get();
@@ -55,7 +55,7 @@ class ReportController extends Controller
         $end   = $request->end_date ?? Carbon::now()->format('Y-m-d');
 
         $orders = Order::with(['customer', 'details.service'])
-            ->where('order_status', 2)
+            ->whereIn('order_status', [2, 3])
             ->whereBetween('order_date', [$start, $end])
             ->orderBy('order_date', 'desc')
             ->get();

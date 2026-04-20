@@ -29,14 +29,14 @@ class CustomerController extends Controller
             'cutomer_name' => 'required|string|max:255',
             'phone' => 'required|string',
             'address' => 'required|string|max:255',
-            'is_member' => 'required|boolean'
+            // 'is_member' => 'required|boolean'
         ]);
 
         Customer::create([
             'cutomer_name' => $request->cutomer_name,
             'phone' => $request->phone,
             'address' => $request->address,
-            'is_member' => $request->is_member,
+            // 'is_member' => $request->is_member,
         ]);
         return redirect()->route('customers.index');
     }
@@ -54,13 +54,13 @@ class CustomerController extends Controller
             'cutomer_name' => 'required|string|max:255',
             'phone' => 'required|string',
             'address' => 'required|string|max:255',
-            'is_member' => 'required|boolean'
+            // 'is_member' => 'required|boolean'
         ]);
         $customer = Customer::find($id);
         $customer->cutomer_name = $request->cutomer_name;
         $customer->phone = $request->phone;
         $customer->address = $request->address;
-        $customer->is_member = $request->is_member;
+        // $customer->is_member = $request->is_member;
         $customer->save();
         return redirect()->route('customers.index');
     }

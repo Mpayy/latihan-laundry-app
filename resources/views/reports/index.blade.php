@@ -59,7 +59,7 @@
             </div>
         </div>
     </div>
-    <div class="col-xxl-3 col-md-6">
+    {{-- <div class="col-xxl-3 col-md-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="rounded-3 p-3 bg-warning bg-opacity-10">
@@ -84,7 +84,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 <div class="row g-3">

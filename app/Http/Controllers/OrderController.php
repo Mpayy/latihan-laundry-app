@@ -8,8 +8,10 @@ use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\LaundryPickup;
 use Illuminate\Http\Request;
-// [FITUR TAMBAHAN] Uncomment baris ini jika diminta fitur Voucher/Diskon
-use App\Models\Voucher;
+// --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
+// Uncomment baris ini jika diminta fitur Voucher
+// use App\Models\Voucher;
+// --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
 
 class OrderController extends Controller
 {
@@ -30,8 +32,10 @@ class OrderController extends Controller
             'address'     => 'required_without:id_customer|nullable|string',
             'id_service'  => 'required|array',
             'qty'         => 'required|array',
-            // [FITUR TAMBAHAN] Uncomment jika diminta fitur Voucher
-            'voucher_code' => 'nullable|string',
+            // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
+            // Uncomment baris ini jika diminta validasi fitur Voucher
+            // 'voucher_code' => 'nullable|string',
+            // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
         ]);
 
         // Tentukan customer: pilih existing atau buat baru sebagai non-member
@@ -73,35 +77,42 @@ class OrderController extends Controller
             $total += $subtotal;
         }
 
-        // [FITUR TAMBAHAN - DISKON & PAJAK]
-        // Untuk mengaktifkan fitur ini saat ujian:
-        //   1. Uncomment seluruh blok komentar di bawah ini
-        //   2. Uncomment `use App\Models\Voucher;` di baris paling atas
-        //   3. Uncomment validasi `voucher_code` di bagian validate()
-        //   4. Uncomment input voucher di orders/create.blade.php
-        //   5. Uncomment ringkasan diskon/pajak di orders/create.blade.php & orders/index.blade.php
-        //   6. Hapus atau comment 2 baris `$order->update` di bagian bawah blok ini
-        //
+        // Siapkan variabel default jika fitur tidak diaktifkan
         $discountPercent = 0;
+        $discountAmount  = 0;
+        $taxPercent      = 0;
+        $taxAmount       = 0;
         $appliedVoucher  = null;
-        if ($customer->is_member) { $discountPercent += 5; }
+
+        // --- [START FITUR TAMBAHAN: DISKON MEMBER] ---
+        // Jika diminta fitur diskon otomatis bagi member, hilangkan tanda // di awal baris bawah ini:
+        // if ($customer->is_member) { $discountPercent += 5; } // Diskon 5% untuk member
+        // --- [END FITUR TAMBAHAN: DISKON MEMBER] ---
+
+        // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
+        // Jika diminta fitur diskon dengan kode voucher, hilangkan tanda /* dan */ di bawah ini:
+        /*
         $voucherCode = trim($request->voucher_code ?? '');
         if ($voucherCode) {
-            $appliedVoucher = Voucher::where('voucher_code', $voucherCode)
+            $appliedVoucher = \App\Models\Voucher::where('voucher_code', $voucherCode)
                 ->where('is_active', 1)->where('expired_at', '>=', now()->startOfDay())->first();
             if ($appliedVoucher) { $discountPercent += $appliedVoucher->discount_precentage; }
         }
-        // $discountAmount     = ($total * $discountPercent) / 100;
-        // $totalAfterDiscount = $total - $discountAmount;
-        // $taxPercent         = 10;
-        // $taxAmount          = ($totalAfterDiscount * $taxPercent) / 100;
-        // $grandTotal         = $totalAfterDiscount + $taxAmount;
-        $taxPercent = 10;
-        $taxAmount = ($total * $taxPercent) / 100;
-        $totalWithTax = $total + $taxAmount;
-        $discountAmount = ($totalWithTax * $discountPercent) / 100;
-        $grandTotal = $totalWithTax - $discountAmount;
+        */
+        // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
 
+        // --- [START FITUR TAMBAHAN: PAJAK PPN] ---
+        // Jika diminta fitur pajak (misal 10%), hilangkan tanda // di awal baris bawah ini:
+        // $taxPercent = 10;
+        // --- [END FITUR TAMBAHAN: PAJAK PPN] ---
+
+        // ==========================================
+        // PERHITUNGAN AKHIR (Biarkan blok ini selalu aktif)
+        // Jika fitur di atas dikomentari, % diskon dan pajak tetap bernilai 0.
+        $taxAmount      = ($total * $taxPercent) / 100;
+        $totalWithTax   = $total + $taxAmount;
+        $discountAmount = ($totalWithTax * $discountPercent) / 100;
+        $grandTotal     = $totalWithTax - $discountAmount;
 
         $order->update([
             'total'            => $total,
@@ -112,8 +123,9 @@ class OrderController extends Controller
             'jumlah_pajak'     => $taxAmount,
             'total_bayar'      => $grandTotal,
         ]);
+
         if ($appliedVoucher) { $appliedVoucher->update(['is_active' => false]); }
-        // [END FITUR TAMBAHAN]
+        // ==========================================
 
         // Handle Pembayaran di Muka
         if ($request->payment_method === 'now' && $request->order_pay >= $grandTotal) {
@@ -178,6 +190,8 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Pembayaran berhasil diproses.');
     }
 
+    // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
+    /*
     public function checkVoucher(Request $request)
     {
         $voucher = Voucher::where('voucher_code', $request->code)
@@ -198,4 +212,16 @@ class OrderController extends Controller
             'message' => 'Voucher tidak ditemukan atau sudah tidak berlaku.'
         ]);
     }
+    */
+    // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
+
+    // --- [START FITUR TAMBAHAN: CETAK STRUK] ---
+    /*
+    public function cetakStruk($id)
+    {
+        $order = Order::with(['customer', 'details.service'])->findOrFail($id);
+        return view('orders.struk', compact('order'));
+    }
+    */
+    // --- [END FITUR TAMBAHAN: CETAK STRUK] ---
 }
