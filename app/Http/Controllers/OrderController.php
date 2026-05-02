@@ -10,7 +10,7 @@ use App\Models\LaundryPickup;
 use Illuminate\Http\Request;
 // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
 // Uncomment baris ini jika diminta fitur Voucher
-// use App\Models\Voucher;
+use App\Models\Voucher;
 // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
 
 class OrderController extends Controller
@@ -34,7 +34,7 @@ class OrderController extends Controller
             'qty'         => 'required|array',
             // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
             // Uncomment baris ini jika diminta validasi fitur Voucher
-            // 'voucher_code' => 'nullable|string',
+            'voucher_code' => 'nullable|string',
             // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
         ]);
 
@@ -86,24 +86,24 @@ class OrderController extends Controller
 
         // --- [START FITUR TAMBAHAN: DISKON MEMBER] ---
         // Jika diminta fitur diskon otomatis bagi member, hilangkan tanda // di awal baris bawah ini:
-        // if ($customer->is_member) { $discountPercent += 5; } // Diskon 5% untuk member
+        if ($customer->is_member) { $discountPercent += 5; } // Diskon 5% untuk member
         // --- [END FITUR TAMBAHAN: DISKON MEMBER] ---
 
         // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
         // Jika diminta fitur diskon dengan kode voucher, hilangkan tanda /* dan */ di bawah ini:
-        /*
+    
         $voucherCode = trim($request->voucher_code ?? '');
         if ($voucherCode) {
             $appliedVoucher = \App\Models\Voucher::where('voucher_code', $voucherCode)
                 ->where('is_active', 1)->where('expired_at', '>=', now()->startOfDay())->first();
             if ($appliedVoucher) { $discountPercent += $appliedVoucher->discount_precentage; }
         }
-        */
+     
         // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
 
         // --- [START FITUR TAMBAHAN: PAJAK PPN] ---
         // Jika diminta fitur pajak (misal 10%), hilangkan tanda // di awal baris bawah ini:
-        // $taxPercent = 10;
+        $taxPercent = 10;
         // --- [END FITUR TAMBAHAN: PAJAK PPN] ---
 
         // ==========================================
@@ -191,7 +191,7 @@ class OrderController extends Controller
     }
 
     // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
-    /*
+
     public function checkVoucher(Request $request)
     {
         $voucher = Voucher::where('voucher_code', $request->code)
@@ -212,16 +212,16 @@ class OrderController extends Controller
             'message' => 'Voucher tidak ditemukan atau sudah tidak berlaku.'
         ]);
     }
-    */
+
     // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
 
     // --- [START FITUR TAMBAHAN: CETAK STRUK] ---
-    /*
+
     public function cetakStruk($id)
     {
         $order = Order::with(['customer', 'details.service'])->findOrFail($id);
         return view('orders.struk', compact('order'));
     }
-    */
+
     // --- [END FITUR TAMBAHAN: CETAK STRUK] ---
 }

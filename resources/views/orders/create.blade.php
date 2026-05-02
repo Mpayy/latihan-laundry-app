@@ -95,7 +95,7 @@
 
                     <!-- --- [START FITUR TAMBAHAN: DISKON VOUCHER] --- -->
                     <!-- Uncomment blok ini jika ujian meminta fitur Kode Voucher -->
-                    <!--
+                    
                     <div class="mb-3 mt-2">
                         <label class="form-label fw-semibold">Kode Voucher (Opsional)</label>
                         <div class="input-group">
@@ -105,7 +105,7 @@
                         </div>
                         <div id="voucherStatus" class="form-text mt-1"></div>
                     </div>
-                    -->
+                    
                     <!-- --- [END FITUR TAMBAHAN: DISKON VOUCHER] --- -->
 
                     <div class="mb-3">
@@ -178,22 +178,22 @@
                     </li>
                     <!-- --- [START FITUR TAMBAHAN: PAJAK PPN] --- -->
                     <!-- Uncomment blok ini jika soal ujian meminta tampilkan Pajak -->
-                    <!--
+                    
                     <li class="list-group-item px-0 d-flex justify-content-between border-0 py-1 bg-transparent">
                         <span class="text-muted border-0 py-1 bg-transparent" style="color: #d9a406 !important;">Pajak (10%)</span>
                         <strong id="summaryTax" style="color: #d9a406 !important;">Rp 0</strong>
                     </li> 
-                    -->
+                    
                     <!-- --- [END FITUR TAMBAHAN: PAJAK PPN] --- -->
 
                     <!-- --- [START FITUR TAMBAHAN: DISKON MEMBER & VOUCHER] --- -->
                     <!-- Uncomment blok ini jika soal ujian meminta tampilkan Diskon -->
-                    <!--
+                    
                     <li class="list-group-item px-0 d-flex justify-content-between">
                         <span class="text-muted">Diskon (Member/Voucher)</span>
                         <strong class="text-success" id="summaryDiscount">Rp 0</strong>
                     </li>
-                    -->
+                    
                     <!-- --- [END FITUR TAMBAHAN: DISKON MEMBER & VOUCHER] --- -->
                     <li class="list-group-item px-0 d-flex justify-content-between">
                         <span class="fw-bold fs-5">Total Bayar</span>
@@ -201,10 +201,10 @@
                     </li>
                 </ul>
 
-                <!-- <div class="alert alert-info mt-3 mb-0 small">
+                <div class="alert alert-info mt-3 mb-0 small">
                     <i class="bi bi-info-circle me-1"></i>
                     Setelah order disimpan, proses pembayaran dapat dilakukan langsung dari halaman ini.
-                </div> -->
+                </div>
             </div>
         </div>
     </div>
@@ -213,7 +213,7 @@
 <script>
     // --- [START FITUR TAMBAHAN: PAJAK PPN] --- 
     // Ubah angka 0 menjadi persentase pajak (misal 10) jika diaktifkan
-    const TAX_PERCENT = 0; 
+    const TAX_PERCENT = 10; 
     // --- [END FITUR TAMBAHAN: PAJAK PPN] --- 
     let currentGrandTotal = 0; // State global untuk fitur Bayar di Muka
 
@@ -285,20 +285,17 @@
 
         // --- [START FITUR TAMBAHAN: DISKON MEMBER] ---
         // Uncomment blok ini jika diminta diskon otomatis anggota (is_member):
-        /*
         const customerOpt = document.querySelector('#customerSelect option:checked');
         if (customerOpt && customerOpt.dataset.isMember == '1') {
             discountPercent += 5;
         }
-        */
         // --- [END FITUR TAMBAHAN: DISKON MEMBER] ---
         
         // --- [START FITUR TAMBAHAN: DISKON VOUCHER] ---
         // Uncomment blok ini jika diminta diskon voucher:
-        /*
         const voucherDiscount = parseFloat(document.getElementById('voucher_code_input')?.dataset.discount || 0);
         discountPercent += voucherDiscount;
-        */
+        
         // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
 
         // Hitung Pajak
@@ -312,10 +309,10 @@
 
         // --- [START FITUR TAMBAHAN: PAJAK & DISKON DI UI] ---
         // Uncomment blok ini jika diminta fitur Update Teks Pajak & Diskon
-        /*
+        
         document.getElementById('summaryTax').textContent = `+ ${formatRupiah(tax)}`;
         document.getElementById('summaryDiscount').textContent = `- ${formatRupiah(discountAmount)}`;
-        */
+        
         // --- [END FITUR TAMBAHAN: PAJAK & DISKON DI UI] ---
 
         document.getElementById('summaryTotal').textContent = formatRupiah(grandTotal);
@@ -372,32 +369,32 @@
     // --- [START FITUR TAMBAHAN: DISKON VOUCHER] --- 
     // Uncomment seluruh blok event listener ini jika diminta fitur Cek Voucher
     
-    // document.getElementById('btnCheckVoucher')?.addEventListener('click', function() {
-    //     const code = document.getElementById('voucher_code_input').value;
-    //     const statusEl = document.getElementById('voucherStatus');
-    //     const inputEl = document.getElementById('voucher_code_input');
-    //     if (!code) { statusEl.textContent = ''; inputEl.dataset.discount = 0; updateSummary(); return; }
-    //     fetch("{{ route('orders.checkVoucher') }}", {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-    //         body: JSON.stringify({ code: code })
-    //     })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         if (data.valid) {
-    //             statusEl.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>${data.message} (Diskon ${data.discount}%)</span>`;
-    //             inputEl.dataset.discount = data.discount;
-    //         } else {
-    //             statusEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>${data.message}</span>`;
-    //             inputEl.dataset.discount = 0;
-    //         }
-    //         updateSummary();
-    //     })
-    //     .catch(error => {
-    //         console.error('Error:', error);
-    //         statusEl.textContent = 'Terjadi kesalahan saat mengecek voucher.';
-    //     });
-    // });
+    document.getElementById('btnCheckVoucher')?.addEventListener('click', function() {
+        const code = document.getElementById('voucher_code_input').value;
+        const statusEl = document.getElementById('voucherStatus');
+        const inputEl = document.getElementById('voucher_code_input');
+        if (!code) { statusEl.textContent = ''; inputEl.dataset.discount = 0; updateSummary(); return; }
+        fetch("{{ route('orders.checkVoucher') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ code: code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                statusEl.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>${data.message} (Diskon ${data.discount}%)</span>`;
+                inputEl.dataset.discount = data.discount;
+            } else {
+                statusEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-circle me-1"></i>${data.message}</span>`;
+                inputEl.dataset.discount = 0;
+            }
+            updateSummary();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            statusEl.textContent = 'Terjadi kesalahan saat mengecek voucher.';
+        });
+    });
     
     // --- [END FITUR TAMBAHAN: DISKON VOUCHER] ---
 

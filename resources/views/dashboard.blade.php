@@ -53,10 +53,10 @@
                 <div class="flex-fill">
                     <p class="text-muted small mb-1">Total Customer</p>
                     <h5 class="fw-bold mb-0 text-warning">{{ $totalCustomer }}</h5>
-                    {{-- <small class="text-muted">
+                    <small class="text-muted">
                         <span class="text-danger">{{ $totalNonPelanggan }} Non-Member</span> &bull;
                         <span class="text-success">{{ $totalPelanggan }} Member</span>
-                    </small> --}}
+                    </small>
                 </div>
             </div>
         </div>
@@ -76,7 +76,7 @@
             </div>
         </div>
     </div>
-    {{-- <div class="col-xxl-3 col-md-6">
+    <div class="col-xxl-3 col-md-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body d-flex align-items-center gap-3">
                 <div class="rounded-3 p-3" style="background:rgba(13,202,240,0.12)">
@@ -92,7 +92,7 @@
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 
 </div>
 

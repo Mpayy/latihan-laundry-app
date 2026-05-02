@@ -78,7 +78,6 @@
                                                         'grandTotal' => $order->total_bayar ?? $order->total,
                                                         // --- [START FITUR TAMBAHAN: MODAL BAYAR DISKON & PAJAK] ---
                                                         // Uncomment baris-baris ini jika soal meminta fitur pajak/diskon:
-                                                        /*
                                                         'hasMember'           => $order->customer->is_member ? true : false,
                                                         'memberPercent'       => $order->customer->is_member ? 5 : 0,
                                                         'taxPercent'          => $order->pajak ?? 0,
@@ -91,7 +90,6 @@
                                                         'voucherPercent'      => max(0, $order->discount_percent - ($order->customer->is_member ? 5 : 0)),
                                                         'voucherDiscountAmount'=> (($order->total + ($order->jumlah_pajak ?? 0)) * max(0, $order->discount_percent - ($order->customer->is_member ? 5 : 0))) / 100,
                                                         'totalAfterVoucher'   => ($order->total + ($order->jumlah_pajak ?? 0)) - ((($order->total + ($order->jumlah_pajak ?? 0)) * $order->discount_percent) / 100),
-                                                        */
                                                         // --- [END FITUR TAMBAHAN: MODAL BAYAR DISKON & PAJAK] ---
                                                     ];
 
@@ -117,11 +115,11 @@
                                                 
                                                 <!-- --- [START FITUR TAMBAHAN: CETAK STRUK] --- -->
                                                 <!-- Uncomment baris di bawah jika diminta fitur print struk -->
-                                                <!--
+                                                
                                                 <a href="{{ route('orders.cetakStruk', $order->id) }}" target="_blank" class="btn btn-sm btn-secondary">
                                                     <i class="bi bi-printer me-1"></i>Struk
                                                 </a>
-                                                -->
+                                                
                                                 <!-- --- [END FITUR TAMBAHAN: CETAK STRUK] --- -->
 
                                                 @if($order->order_status === 2)
@@ -321,7 +319,6 @@
 
                 // --- [START FITUR TAMBAHAN: MODAL BAYAR DISKON & PAJAK UI] ---
                 // Uncomment blok ini jika soal meminta detail pajak & diskon tampil di modal bayar:
-                /*
                 // 1. Total Pesanan Dasar
                 ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-muted border-0 py-1 bg-transparent"><span>Subtotal Pesanan</span><span>Rp ${Number(calc.baseTotal).toLocaleString('id-ID')}</span></li>`;
                 
@@ -340,7 +337,7 @@
                 if (calc.hasVoucher) {
                     ringkasanListEl.innerHTML += `<li class="list-group-item px-0 d-flex justify-content-between text-danger border-0 py-1 bg-transparent"><span>Potongan Voucher (${calc.voucherPercent}%)</span><span>- Rp ${Number(calc.voucherDiscountAmount).toLocaleString('id-ID')}</span></li>`;
                 }
-                */
+                
                 // --- [END FITUR TAMBAHAN: MODAL BAYAR DISKON & PAJAK UI] ---
 
                 // Total Akhir (selalu ditampilkan)
