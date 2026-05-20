@@ -31,17 +31,17 @@
         </a>
       </li><!-- End Services Page Nav -->
 
-      <!-- --- [START FITUR TAMBAHAN: DISKON VOUCHER] --- -->
+      <!-- [START FITUR TAMBAHAN: DISKON VOUCHER] -->
       <!-- Uncomment blok di bawah ini jika diminta fitur Master Data Voucher -->
-      <!--
+      
       <li class="nav-item">
         <a class="nav-link collapsed" href="{{ route('vouchers.index') }}">
           <i class="bi bi-ticket-perforated"></i>
           <span>Vouchers</span>
         </a>
       </li>
-      -->
-      <!-- --- [END FITUR TAMBAHAN: DISKON VOUCHER] --- -->
+      
+      <!-- [END FITUR TAMBAHAN: DISKON VOUCHER] -->
       @endif
       @if (Auth::user()->level->level_name == 'operator')
       <li class="nav-item">

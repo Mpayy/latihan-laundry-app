@@ -35,21 +35,21 @@ class DashboardController extends Controller
             ->sum('total_bayar');
 
         // // Total pendapatan bulan lalu
-        // $bulanLalu = Carbon::now()->subMonth()->format('Y-m');
-        // $pendapatanBulanLalu = Order::where('order_status', 2)
-        //     ->whereRaw("DATE_FORMAT(order_date, '%Y-%m') = ?", [$bulanLalu])
-        //     ->sum('total_bayar');
+        $bulanLalu = Carbon::now()->subMonth()->format('Y-m');
+        $pendapatanBulanLalu = Order::where('order_status', 2)
+            ->whereRaw("DATE_FORMAT(order_date, '%Y-%m') = ?", [$bulanLalu])
+            ->sum('total_bayar');
 
         // // Persentase pertumbuhan
-        // $pertumbuhanPendapatan = $pendapatanBulanLalu > 0
-        //     ? round((($pendapatanBulanIni - $pendapatanBulanLalu) / $pendapatanBulanLalu) * 100, 1)
-        //     : ($pendapatanBulanIni > 0 ? 100 : 0);
+        $pertumbuhanPendapatan = $pendapatanBulanLalu > 0
+            ? round((($pendapatanBulanIni - $pendapatanBulanLalu) / $pendapatanBulanLalu) * 100, 1)
+            : ($pendapatanBulanIni > 0 ? 100 : 0);
 
         // // ── Order Terbaru (5 terakhir) ───────────────────────────────────────
-        // $orderTerbaru = Order::with('customer')
-        //     ->latest()
-        //     ->take(5)
-        //     ->get();
+        $orderTerbaru = Order::with('customer')
+            ->latest()
+            ->take(5)
+            ->get();
 
         // // ── Grafik pendapatan 6 bulan terakhir ──────────────────────────────
         // $grafikData = [];
@@ -63,23 +63,35 @@ class DashboardController extends Controller
         // }
 
         // // ── Layanan Terpopuler (top 5) ───────────────────────────────────────
-        // $layananPopuler = \DB::table('trans_order_details as od')
-        //     ->join('type_of_services as s', 's.id', '=', 'od.id_service')
-        //     ->join('trans_orders as o', 'o.id', '=', 'od.id_order')
-        //     ->where('o.order_status', 2)
-        //     ->selectRaw('s.service_name, SUM(od.qty) as total_qty, SUM(od.subtotal) as total_pendapatan')
-        //     ->groupBy('s.id', 's.service_name')
-        //     ->orderByDesc('total_qty')
-        //     ->take(5)
-        //     ->get();
+        $layananPopuler = DB::table('trans_order_details as od')
+            ->join('type_of_services as s', 's.id', '=', 'od.id_service')
+            ->join('trans_orders as o', 'o.id', '=', 'od.id_order')
+            ->where('o.order_status', 2)
+            ->selectRaw('s.service_name, SUM(od.qty) as total_qty, SUM(od.subtotal) as total_pendapatan')
+            ->groupBy('s.id', 's.service_name')
+            ->orderByDesc('total_qty')
+            ->take(5)
+            ->get();
 
         return view('dashboard', compact(
             'title',
-            'totalOrder', 'orderPending', 'orderDiambil', 'orderLunas',
-            'totalCustomer', 'totalPelanggan', 'totalNonPelanggan', 'totalLayanan', 'totalVoucher', 'totalVoucherAktif', 'totalVoucherTidakAktif',
-            'pendapatanBulanIni', 
-            // 'pendapatanBulanLalu', 'pertumbuhanPendapatan',
-            // 'orderTerbaru', 'grafikData', 'layananPopuler'
+            'totalOrder',
+            'orderPending',
+            'orderDiambil',
+            'orderLunas',
+            'totalCustomer',
+            'totalPelanggan',
+            'totalNonPelanggan',
+            'totalLayanan',
+            'totalVoucher',
+            'totalVoucherAktif',
+            'totalVoucherTidakAktif',
+            'pendapatanBulanIni',
+            'pendapatanBulanLalu',
+            'pertumbuhanPendapatan',
+            'orderTerbaru',
+            // 'grafikData',
+            'layananPopuler'
         ));
     }
 }

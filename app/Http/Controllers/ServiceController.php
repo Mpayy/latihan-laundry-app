@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\ServiceRequest;
 use App\Models\Service;
 
 class ServiceController extends Controller
@@ -10,60 +10,38 @@ class ServiceController extends Controller
     public function index()
     {
         $title = 'Master Data Services';
-
         $services = Service::all();
-
         return view('services.index', compact('services', 'title' ));
     }
 
     public function create()
     {
         $title = 'Tambah Service';
-
         return view('services.create', compact('title' ));
     }
 
-    public function store(Request $request)
+    public function store(ServiceRequest $request)
     {
-        $request->validate([
-            'service_name' => 'required|string|max:255',
-            'price' => 'required|integer',
-            'description' => 'required|string|max:255'
-        ]);
-
-        Service::create([
-            'service_name' => $request->service_name,
-            'price' => $request->price,
-            'description' => $request->description,
-        ]);
+        $validateData = $request->validated();
+        Service::create($validateData);
         return redirect()->route('services.index');
     }
 
-    public function edit($id)
+    public function edit(Service $service)
     {
         $title = "Edit Service";
-        $service = Service::find($id);
         return view('services.edit', compact('service', 'title'));
     }
 
-    public function update(Request $request, $id)
+    public function update(ServiceRequest $request, Service $service)
     {
-        $request->validate([
-            'service_name' => 'required|string|max:255',
-            'price' => 'required|integer',
-            'description' => 'required|string|max:255'
-        ]);
-        $service = Service::find($id);
-        $service->service_name = $request->service_name;
-        $service->price = $request->price;
-        $service->description = $request->description;
-        $service->save();
+        $validateData = $request->validated();
+        $service->update($validateData);
         return redirect()->route('services.index');
     }
 
-    public function destroy($id)
+    public function destroy(Service $service)
     {
-        $service = Service::find($id);
         $service->delete();
         return redirect()->route('services.index');
     }

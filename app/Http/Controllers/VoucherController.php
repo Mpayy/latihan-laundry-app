@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\VoucherRequest;
 use App\Models\Voucher;
-use Illuminate\Http\Request;
 
 class VoucherController extends Controller
 {
     public function index()
     {
-        $title = 'Data Voucher';
+        $title = 'Master Data Voucher';
         $vouchers = Voucher::latest()->get();
         return view('vouchers.index', compact('vouchers', 'title'));
     }
@@ -20,51 +20,29 @@ class VoucherController extends Controller
         return view('vouchers.create', compact('title'));
     }
 
-    public function store(Request $request)
+    public function store(VoucherRequest $request)
     {
-        $request->validate([
-            'voucher_code' => 'required|unique:vouchers,voucher_code',
-            'discount_precentage' => 'required|numeric|min:1|max:100',
-            'expired_at' => 'required|date',
-        ]);
-
-        Voucher::create([
-            'voucher_code' => $request->voucher_code,
-            'discount_precentage' => $request->discount_precentage,
-            'expired_at' => $request->expired_at,
-            'is_active' => 1,
-        ]);
-
+        $validateData = $request->validated();
+        Voucher::create($validateData);
         return redirect()->route('vouchers.index')->with('success', 'Voucher berhasil ditambahkan.');
     }
 
-    public function edit($id)
+    public function edit(Voucher $voucher)
     {
         $title = 'Edit Voucher';
-        $voucher = Voucher::findOrFail($id);
         return view('vouchers.edit', compact('voucher', 'title'));
     }
 
-    public function update(Request $request, $id)
+    public function update(VoucherRequest $request, Voucher $voucher)
     {
-        $request->validate([
-            'voucher_code' => 'required|unique:vouchers,voucher_code,' . $id,
-            'discount_precentage' => 'required|numeric|min:1|max:100',
-            'expired_at' => 'required|date',
-            'is_active' => 'required|boolean',
-        ]);
-
-        $voucher = Voucher::findOrFail($id);
-        $voucher->update($request->all());
-
+        $validateData = $request->validated();
+        $voucher->update($validateData);
         return redirect()->route('vouchers.index')->with('success', 'Voucher berhasil diperbarui.');
     }
 
-    public function destroy($id)
+    public function destroy(Voucher $voucher)
     {
-        $voucher = Voucher::findOrFail($id);
         $voucher->delete();
-
         return redirect()->route('vouchers.index')->with('success', 'Voucher berhasil dihapus.');
     }
 }

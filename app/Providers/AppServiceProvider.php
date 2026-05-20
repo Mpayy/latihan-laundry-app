@@ -21,9 +21,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Paksa semua URL menggunakan HTTPS jika di Production (Railway)
-        if (config('app.env') === 'production') {
-            URL::forceRootUrl(config('app.url'));
-            URL::forceScheme('https');
-        }
+        // if (config('app.env') === 'production') {
+        //     URL::forceRootUrl(config('app.url'));
+        //     URL::forceScheme('https');
+        // }
     }
 }
