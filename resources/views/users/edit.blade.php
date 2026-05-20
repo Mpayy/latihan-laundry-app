@@ -35,8 +35,8 @@
                     </div>
 
                     <div class="mb-2">
-                        <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
-                        <input type="password" name="password" class="form-control" required>
+                        <label class="form-label fw-semibold">Password</label>
+                        <input type="password" name="password" class="form-control">
                         <span class="text-secondary">Kosongkan kolom ini jika Anda tidak ingin mengubah kata sandi.</span>
                     </div>
 

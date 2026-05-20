@@ -268,7 +268,7 @@
                 const orderId = this.dataset.orderId;
                 const customer = this.dataset.customer;
                 document.getElementById('pickupCustomerName').textContent = customer;
-                document.getElementById('pickupForm').action = '/orders/pickup/' + orderId;
+                document.getElementById('pickupForm').action = '/orders/' + orderId + '/pickup';
             });
         });
 
